@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>for Chhavi — three years, unboxed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6EFDC;
+    --khaki:#D8C89A;
+    --khaki-deep:#C4AF78;
+    --brown:#8B5E3C;
+    --brown-deep:#6E4A2E;
+    --sage:#9CB89A;
+    --yellow:#F3D98B;
+    --rose:#EFAFA6;
+    --ink:#3A2E22;
+    --ink-soft:#6B5D48;
+    --white:#FFFCF4;
+    --gold:#B9893C;
+    --radius:18px;
+    --cardboard:#A07855;
+    --mustard:#F4D03F;
+    --forest:#1E8449;
+    --beige-text:#F5E6C8;
+    --dream-mint:#7FD1C3;
+    --dream-navy:#1B2A4A;
+    --dream-pink:#F2A6B5;
+    --dream-cream:#FBF6EC;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--cream); color:var(--ink); font-family:'Manrope', sans-serif; -webkit-font-smoothing:antialiased; overscroll-behavior:none;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;} }
+  ::selection{background:var(--rose); color:var(--ink);}
+  .eyebrow{font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-soft); font-weight:500;}
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:500; letter-spacing:-0.01em; color:var(--ink);}
+  button{font-family:inherit; cursor:pointer; border:none; background:none;}
+  p{color:var(--ink-soft);}
+
+  /* ============ SCROLL-SNAP FULL-PAGE FRAME ============ */
+  #snap{height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; scroll-behavior:smooth;}
+  .panel{
+    height:100vh; width:100%; scroll-snap-align:start; scroll-snap-stop:always;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:relative; padding:60px 24px; overflow:hidden;
+    background-color:var(--cream);
+  }
+  .panel .eyebrow{margin-bottom:10px;}
+  .panel h2{font-size:clamp(24px,4.5vw,36px); text-align:center; margin-bottom:8px;}
+  .panel .lede{max-width:420px; text-align:center; font-size:14px; line-height:1.6; margin-bottom:34px;}
+  .checker-bg{
+    position:absolute; inset:0; z-index:0;
+    background-image:
+      linear-gradient(45deg, var(--khaki) 25%, transparent 25%, transparent 75%, var(--khaki) 75%),
+      linear-gradient(45deg, var(--khaki) 25%, transparent 25%, transparent 75%, var(--khaki) 75%);
+    background-size:36px 36px; background-position:0 0, 18px 18px;
+    opacity:0.35;
+  }
+  .panel > *{position:relative; z-index:1;}
+
+  /* ---- side progress dots ---- */
+  #dots{position:fixed; right:18px; top:50%; transform:translateY(-50%); z-index:50; display:flex; flex-direction:column; gap:12px;}
+  #dots button{width:8px; height:8px; border-radius:50%; background:rgba(58,46,34,0.25); transition:all .3s;}
+  #dots button.active{background:var(--gold); height:22px; border-radius:5px;}
+
+  /* ============ PANEL 1 — HERO / BOX ============ */
+  #panel-hero{background:radial-gradient(ellipse at 50% 30%, var(--khaki) 0%, var(--cream) 65%); cursor:pointer;}
+  .box-wrap{position:relative; width:180px; height:150px; margin-bottom:36px;}
+  .box-base{position:absolute; bottom:0; left:0; width:100%; height:110px; background:linear-gradient(160deg, var(--rose), #d98d82); border-radius:6px; box-shadow:0 30px 60px -20px rgba(58,46,34,0.35);}
+  .box-lid{position:absolute; top:20px; left:-6px; width:calc(100% + 12px); height:36px; background:linear-gradient(160deg, #f4c7c0, var(--rose)); border-radius:6px; transform-origin:left center; transition:transform 0.9s cubic-bezier(.68,-0.4,.27,1.4), opacity 0.6s ease 0.2s; z-index:3;}
+  .ribbon-v{position:absolute; top:0; left:50%; transform:translateX(-50%); width:22px; height:130px; background:var(--gold); z-index:4;}
+  .ribbon-h{position:absolute; top:38px; left:0; width:100%; height:22px; background:var(--gold); z-index:2;}
+  .bow{position:absolute; top:14px; left:50%; transform:translateX(-50%); width:54px; height:34px; z-index:5; transition:transform .7s cubic-bezier(.68,-0.4,.27,1.4), opacity .5s ease;}
+  .bow::before, .bow::after{content:''; position:absolute; width:26px; height:26px; background:var(--gold); border-radius:50% 50% 50% 0; top:0;}
+  .bow::before{left:0; transform:rotate(-45deg);}
+  .bow::after{right:0; transform:rotate(45deg) scaleX(-1);}
+  #panel-hero.opened .box-lid{transform:translateY(-70px) rotate(-35deg); opacity:0;}
+  #panel-hero.opened .bow{transform:translateX(-50%) translateY(-90px) rotate(-20deg) scale(0.7); opacity:0;}
+  #panel-hero.opened .ribbon-v{opacity:0; transition:opacity .3s ease;}
+  #panel-hero h1{font-size:clamp(26px,5vw,42px); max-width:600px; line-height:1.15; margin-bottom:14px; text-align:center;}
+  #panel-hero .sub{font-size:14.5px; color:var(--ink-soft); max-width:380px; text-align:center; margin-bottom:26px;}
+  .tap-hint{font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:0.55; transform:translateY(0);} 50%{opacity:1; transform:translateY(-3px);}}
+  #panel-hero.opened .tap-hint{opacity:0;}
+  .scroll-cue{margin-top:18px; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.15em; color:var(--ink-soft); opacity:0; transition:opacity 0.6s ease 0.5s;}
+  #panel-hero.opened .scroll-cue{opacity:0.8;}
+
+  /* ============ PANEL 2 — PHOTOBOOK ============ */
+  .house-tag{ position:relative; width:min(280px,72vw); }
+  .house-tag .roof{
+    width:0; height:0; margin:0 auto;
+    border-left:calc(min(280px,72vw)/2) solid transparent;
+    border-right:calc(min(280px,72vw)/2) solid transparent;
+    border-bottom:56px solid var(--brown);
+    filter:drop-shadow(0 6px 10px rgba(58,46,34,0.2));
+  }
+  .house-tag .chimney{position:absolute; top:-14px; left:20%; width:16px; height:26px; background:var(--brown-deep); border-radius:2px 2px 0 0;}
+  .house-tag .body{
+    background:var(--yellow); border-radius:0 0 14px 14px; margin-top:-2px;
+    box-shadow:0 20px 40px -18px rgba(58,46,34,0.35);
+    padding:26px 20px 22px; display:flex; flex-direction:column; align-items:center; gap:12px;
+    aspect-ratio:3/3.6;
+  }
+  .house-tag .door{width:34px; height:44px; background:var(--brown); border-radius:16px 16px 0 0; position:relative; margin-top:auto;}
+  .house-tag .door::after{content:''; position:absolute; right:6px; top:22px; width:4px; height:4px; border-radius:50%; background:var(--yellow);}
+  .house-tag .heart-window{
+    width:80px; height:80px; background:var(--cream); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:30px;
+    box-shadow:inset 0 0 0 3px var(--brown);
+  }
+  .house-tag .title{font-family:'Fraunces',serif; font-weight:600; font-size:15px; text-align:center; color:var(--brown-deep); line-height:1.3;}
+  .house-tag .sub-title{font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--brown); opacity:0.8;}
+
+  .book-stage{width:min(300px,80vw); aspect-ratio:3/3.9; position:relative; perspective:1600px; margin-bottom:20px;}
+  .book-stage.closed .house-tag{cursor:pointer; transition:transform .3s;}
+  .book-stage.closed .house-tag:hover{transform:translateY(-4px);}
+  .book-flip{position:absolute; inset:0; transform-style:preserve-3d; transition:transform 1s cubic-bezier(.5,0,.2,1); transform-origin:left center;}
+  .book-stage.open .book-flip{transform:rotateY(-165deg);}
+  .book-cover-face, .book-inner-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:14px; overflow:hidden;}
+  .book-inner-face{transform:rotateY(180deg); background:var(--white); box-shadow:0 20px 40px -18px rgba(58,46,34,0.3);}
+  .pages-wrap{position:absolute; inset:0; opacity:0; transition:opacity .4s ease .5s; pointer-events:none;}
+  .book-stage.open .pages-wrap{opacity:1; pointer-events:auto;}
+  .page{position:absolute; inset:0; border-radius:12px; overflow:hidden; background:var(--white); transition:transform .7s cubic-bezier(.5,0,.2,1); transform-origin:left center; box-shadow:0 10px 24px -14px rgba(58,46,34,0.3); backface-visibility:hidden;}
+  .page .photo-slot{width:100%; height:100%; border-radius:12px;}
+  .page-tag{position:absolute; bottom:8px; right:12px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); background:rgba(255,255,255,0.9); padding:2px 8px; border-radius:10px; z-index:5;}
+  .book-controls{display:flex; align-items:center; gap:18px; opacity:0; transition:opacity .4s ease .6s;}
+  .book-stage.open ~ .book-controls{opacity:1;}
+  .book-controls button{width:40px; height:40px; border-radius:50%; border:1px solid var(--brown); background:var(--white); color:var(--brown); font-size:16px; display:flex; align-items:center; justify-content:center; transition:background .2s;}
+  .book-controls button:hover{background:var(--rose);}
+  .book-controls .page-count{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft);}
+
+  /* ---- Roommate booklet cover redesign (scoped to panel-book only) ---- */
+  #panel-book .book-cover-face{
+    background: var(--cardboard);
+    display:flex; align-items:center; justify-content:center;
+    padding: 14px;
+  }
+  #panel-book .book-cover-face .house-tag{
+    transform: scale(0.82);
+  }
+  #panel-book .house-tag .roof{
+    position: relative;
+    border-bottom-color: var(--mustard);
+    filter: none;
+  }
+  #panel-book .house-tag .roof::before{
+    content:'';
+    position:absolute;
+    top:-4px;
+    left: calc(-1 * (min(280px,72vw)/2) - 4px);
+    width:0; height:0;
+    border-left: calc(min(280px,72vw)/2 + 4px) solid transparent;
+    border-right: calc(min(280px,72vw)/2 + 4px) solid transparent;
+    border-bottom: 60px solid var(--forest);
+    z-index:-1;
+  }
+  #panel-book .house-tag .chimney{
+    background: var(--mustard);
+    border: 2px solid var(--forest);
+    border-radius: 1px;
+  }
+  #panel-book .house-tag .body{
+    background: var(--mustard);
+    box-shadow: none;
+    position: relative;
+    gap: 8px;
+  }
+  #panel-book .house-tag .circle-window{
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--cardboard);
+    margin: 2px auto 4px;
+  }
+  #panel-book .house-tag .heart-window{ display:none; }
+  #panel-book .house-tag .cover-text{
+    text-align:center;
+    font-family:'Amatic SC', sans-serif;
+    color: var(--forest);
+    line-height: 0.95;
+    margin-bottom: 4px;
+  }
+  #panel-book .house-tag .cover-text .line1{ font-size: clamp(24px, 6vw, 32px); font-weight:700; letter-spacing:0.02em; }
+  #panel-book .house-tag .cover-text .line2{ font-size: clamp(12px, 2.6vw, 15px); font-weight:400; margin:2px 0; }
+  #panel-book .house-tag .cover-text .line3{ font-size: clamp(14px, 3.2vw, 18px); font-weight:700; letter-spacing:0.03em; }
+  #panel-book .house-tag .door{
+    width: 30px; height: 40px;
+    background: var(--forest);
+    border-radius: 3px;
+    margin-top: 4px;
+  }
+  #panel-book .house-tag .door::after{
+    background: #fff;
+    width: 5px; height: 5px;
+    right: 5px; top: 18px;
+  }
+  #panel-book .house-tag .steps{
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    margin-top: 4px;
+  }
+  #panel-book .house-tag .steps div{
+    height: 3px; background: var(--forest); opacity: 0.55; border-radius: 1px;
+  }
+  #panel-book .house-tag .steps div:nth-child(1){ width: 46px; }
+  #panel-book .house-tag .steps div:nth-child(2){ width: 58px; }
+  #panel-book .house-tag .title,
+  #panel-book .house-tag .sub-title{ display:none; }
+  /* ---- NCT Dream swing-stand redesign (scoped to panel-stand only) ---- */
+  #panel-stand{ background:var(--dream-navy); }
+  #panel-stand .eyebrow, #panel-stand h2, #panel-stand .lede{ color:var(--dream-cream); }
+  #panel-stand .lede{ opacity:0.75; }
+  #panel-stand .hook, #panel-stand .ring{ background:var(--dream-mint); border-color:var(--dream-mint); }
+
+  #panel-stand .house-tag .roof{ border-bottom-color:var(--dream-mint); }
+  #panel-stand .house-tag .chimney{ background:var(--dream-pink); }
+  #panel-stand .house-tag .body{ background:var(--dream-cream); box-shadow:0 20px 40px -18px rgba(0,0,0,0.45); }
+  #panel-stand .house-tag .door{ background:var(--dream-navy); }
+  #panel-stand .house-tag .door::after{ background:var(--dream-mint); }
+
+  #panel-stand .stand-photo-stage{
+    position:relative; width:100%; flex:1; min-height:150px;
+    border-radius:10px; overflow:hidden;
+  }
+  #panel-stand .stand-photo-stage .photo-slot{
+    position:absolute; inset:0; margin:0; width:100%; height:100%;
+    border-radius:10px; border-color:var(--dream-navy);
+  }
+  #panel-stand .base-photo{ opacity:0.9; }
+  #panel-stand .reveal-photo{
+    opacity:0; transition:opacity .3s ease; border-style:solid; border-color:transparent;
+  }
+  #panel-stand .reveal-photo.active{ opacity:1; }
+  #panel-stand .member-tag{
+    position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+    font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--dream-navy); background:var(--dream-mint);
+    padding:2px 8px; border-radius:10px;
+  }
+  #panel-stand .dream-brand{
+    font-family:'Fraunces',serif; font-weight:700; font-size:11px;
+    letter-spacing:0.14em; text-transform:uppercase; color:var(--dream-navy);
+    opacity:0.7; margin-top:auto;
+  }
+
+  #panel-stand .stand-back{ background:var(--dream-cream); }
+  #panel-stand .stand-back .eyebrow{ color:var(--dream-mint); background:none; -webkit-text-fill-color:unset; }
+  #panel-stand .stand-back p{ color:var(--dream-navy); }
+
+  /* ============ DIE-CUT ACRYLIC STANDEES ============ */
+  #panel-standees{
+    background:var(--dream-cream);
+    overflow-y:auto;
+    align-items:stretch;
+    padding-top:50px;
+    padding-bottom:50px;
+  }
+  #panel-standees .eyebrow,
+  #panel-standees h2,
+  #panel-standees .lede{
+    width:100%;
+    text-align:center;
+  }
+  #panel-standees .lede{
+    max-width:420px;
+    margin:0 auto;
+  }
+  #panel-standees .standee-row{
+    width:100%; max-width:1100px; margin:0 auto;
+    justify-content:center;
+  }
+  .standee-row{
+    display:flex; gap:24px 20px; flex-wrap:wrap; justify-content:center;
+    perspective:900px;
+  }
+  .standee-card{
+    display:flex; flex-direction:column; align-items:center;
+    width:140px; cursor:pointer;
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @media (max-width:900px){
+    .standee-card{ width:120px; }
+  }
+  @media (max-width:640px){
+    .standee-row{ gap:20px; }
+    .standee-card{ width:42vw; max-width:170px; }
+  }
+  .standee-card:hover{ transform:translateY(-10px) rotateZ(-2deg); }
+
+ .standee-cutout{
+    position:relative; width:100%; height:200px;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .standee-cutout img{
+    max-width:100%; height:200px; width:auto; display:block;
+    object-fit:contain;
+    mix-blend-mode:screen;
+    filter:
+      drop-shadow(3px 0 0 var(--forest))
+      drop-shadow(-3px 0 0 var(--forest))
+      drop-shadow(0 3px 0 var(--forest))
+      drop-shadow(0 -3px 0 var(--forest))
+      drop-shadow(3px 3px 0 var(--forest))
+      drop-shadow(-3px -3px 0 var(--forest))
+      drop-shadow(3px -3px 0 var(--forest))
+      drop-shadow(-3px 3px 0 var(--forest));
+  }
+  .standee-cutout .placeholder-note{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--ink-soft); text-align:center;
+    border:2px dashed var(--forest); border-radius:10px; padding:40px 14px;
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  }
+
+  .standee-base{
+    width:110px; height:24px; margin-top:-6px;
+    background:var(--forest);
+    transform:perspective(300px) rotateX(55deg);
+    transform-origin:top center;
+    border-radius:3px;
+    box-shadow:0 10px 18px -8px rgba(0,0,0,0.35);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .standee-card:hover .standee-base{ transform:perspective(300px) rotateX(60deg) scale(1.03); }
+  .standee-base span{
+    font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--mustard); text-align:center; line-height:1.3;
+    width:100%; display:block;
+  }
+
+  .cover-spread{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  width:min(520px,90vw);
+  margin:0 auto 20px;
+  perspective:1400px;
+}
+.cover-spread .cover-panel{
+  aspect-ratio:3/3.6;
+  padding:26px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:#A07855;
+  box-shadow:0 20px 40px -18px rgba(58,46,34,0.35);
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  transform-style:preserve-3d;
+}
+.cover-spread .cover-front{ transform-origin:right center; border-radius:14px 4px 4px 14px; }
+.cover-spread .cover-back{ transform-origin:left center; border-radius:4px 14px 14px 4px; }
+.cover-spread .cover-front:hover{ transform:rotateY(-10deg); }
+.cover-spread .cover-back:hover{ transform:rotateY(10deg); }
+
+.cover-spread .cover-text{ font-family:'Amatic SC', sans-serif; line-height:0.95; text-align:center; }
+.cover-spread .cover-front .cover-text{ color:#F4D03F; }
+.cover-spread .cover-back .cover-text{ color:#F5E6C8; text-align:left; align-self:flex-start; }
+.cover-spread .cover-text .line1{ font-size:clamp(26px,6vw,34px); font-weight:700; letter-spacing:0.02em; }
+.cover-spread .cover-text .line2{ font-size:clamp(12px,2.6vw,15px); margin:4px 0; }
+.cover-spread .cover-text .line3{ font-size:clamp(15px,3.2vw,19px); font-weight:700; letter-spacing:0.03em; }
+
+.cover-spread .back-badge{
+  margin-top:auto; align-self:flex-end;
+  background:#F4D03F; padding:10px 14px; border-radius:4px; transform:rotate(-3deg);
+}
+
+  /* ---- back cover (last page of the book) ---- */
+  .page-back{
+    background: var(--cardboard) !important;
+    display:flex; flex-direction:column; padding: 26px 22px;
+  }
+  .page-back .cover-text{
+    font-family:'Amatic SC', sans-serif;
+    color: var(--beige-text);
+    text-align:left;
+    line-height: 0.95;
+    margin-top: 8px;
+  }
+  .page-back .cover-text .line1{ font-size: clamp(30px,7vw,40px); font-weight:700; }
+  .page-back .cover-text .line2{ font-size: clamp(13px,2.8vw,16px); margin:4px 0; }
+  .page-back .cover-text .line3{ font-size: clamp(16px,3.6vw,20px); font-weight:700; letter-spacing:0.02em; }
+  .page-back .badge{
+    margin-top: auto;
+    align-self: flex-end;
+    background: var(--mustard);
+    padding: 10px 14px;
+    border-radius: 4px;
+    transform: rotate(-3deg);
+  }
+  .page-back .badge svg{ display:block; }
+
+  /* ============ PHOTO SLOTS (shared) ============ */
+  .photo-slot{
+    border:2px dashed var(--brown); border-radius:10px;
+    background-color:rgba(139,94,60,0.06); background-size:cover; background-position:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    color:var(--ink-soft); text-align:center; padding:14px;
+  }
+  .photo-slot.filled{border-style:solid; border-color:transparent;}
+  .photo-slot.filled .slot-icon, .photo-slot.filled .slot-label, .photo-slot.filled .slot-sub{display:none;}
+  .photo-slot .slot-icon{font-size:22px; opacity:0.6;}
+  .photo-slot .slot-label{font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.05em; text-transform:uppercase; font-weight:500; opacity:0.75;}
+  .photo-slot .slot-sub{font-size:10px; opacity:0.55; max-width:180px;}
+
+  /* ============ PANEL 3 — SWINGING HOUSE STAND ============ */
+  .swing-rig{width:100%; display:flex; flex-direction:column; align-items:center;}
+  .hook{width:4px; height:46px; background:var(--brown-deep); border-radius:2px;}
+  .ring{width:16px; height:16px; border:3px solid var(--brown-deep); border-radius:50%; margin-bottom:-4px;}
+  .swing-house{
+    width:min(230px,62vw); cursor:grab; touch-action:none; user-select:none;
+    transform-origin:top center; transition:transform .6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .swing-house:active{cursor:grabbing;}
+  .swing-house .inner3d{position:relative; width:100%; transform-style:preserve-3d; transition:transform .8s cubic-bezier(.5,0,.2,1);}
+  .swing-house.flipped .inner3d{transform:rotateY(180deg);}
+  .stand-face{backface-visibility:hidden;}
+  .stand-back{position:absolute; inset:0; transform:rotateY(180deg); backface-visibility:hidden; background:var(--white); border-radius:0 0 14px 14px; margin-top:56px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:22px; box-shadow:0 20px 40px -18px rgba(58,46,34,0.35); aspect-ratio:3/3.6;}
+  .stand-back p{font-family:'Fraunces',serif; font-style:italic; font-size:14px; line-height:1.6; color:var(--ink);}
+  .swing-hint{margin-top:18px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.08em; color:var(--ink-soft); text-transform:uppercase; text-align:center;}
+
+  /* ============ PANEL 4 — POSTCARD CAROUSEL ============ */
+  .carousel-viewport{width:min(300px,80vw); aspect-ratio:4/5; position:relative; overflow:hidden; border-radius:16px; box-shadow:0 24px 46px -22px rgba(58,46,34,0.4); margin-bottom:22px;}
+  .carousel-track{display:flex; height:100%; transition:transform .5s cubic-bezier(.5,0,.2,1); touch-action:pan-y;}
+  .carousel-track .card{min-width:100%; height:100%; background:var(--white); display:flex; flex-direction:column; padding:16px;}
+  .carousel-track .card .photo-slot{flex:1; margin-bottom:12px;}
+  .carousel-track .card .line{font-family:'Fraunces',serif; font-style:italic; font-size:14px; color:var(--ink-soft); text-align:center;}
+  .carousel-controls{display:flex; align-items:center; gap:18px;}
+  .carousel-controls button{width:40px; height:40px; border-radius:50%; border:1px solid var(--brown); background:var(--white); color:var(--brown); font-size:16px;}
+  .carousel-dots{display:flex; gap:6px;}
+  .carousel-dots span{width:6px; height:6px; border-radius:50%; background:rgba(58,46,34,0.25);}
+  .carousel-dots span.active{background:var(--gold);}
+
+  /* ============ PANEL 5 — SCRATCH CARD ============ */
+  .scratch-wrap{position:relative; width:min(320px,84vw); aspect-ratio:4/2.6; border-radius:16px; overflow:hidden; box-shadow:0 24px 46px -22px rgba(58,46,34,0.4);}
+  .scratch-message{position:absolute; inset:0; background:var(--white); display:flex; align-items:center; justify-content:center; padding:26px; text-align:center;}
+  .scratch-message p{font-family:'Fraunces',serif; font-style:italic; font-size:16px; line-height:1.6; color:var(--ink);}
+  .scratch-canvas{position:absolute; inset:0; touch-action:none;}
+  .scratch-hint{margin-top:18px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.08em; color:var(--ink-soft); text-transform:uppercase;}
+
+  /* ============ PANEL 6 — COUNTERS ============ */
+  .counters{display:flex; gap:20px; flex-wrap:wrap; justify-content:center;}
+  .counter-card{background:var(--white); border:1px solid rgba(58,46,34,0.1); border-radius:var(--radius); padding:28px 30px; text-align:center; min-width:160px;}
+  .counter-card .big-num{font-family:'Fraunces',serif; font-size:clamp(36px,6vw,50px); color:var(--ink); line-height:1; margin:8px 0 6px;}
+  .counter-card .caption{font-size:13px; color:var(--ink-soft);}
+
+  /* ============ PANEL 7 — NOTE ============ */
+  .note-card{background:var(--white); border-radius:var(--radius); padding:44px 34px; box-shadow:0 24px 50px -28px rgba(58,46,34,0.3); max-width:520px;}
+  .note-card p.msg{font-family:'Fraunces',serif; font-size:clamp(16px,2.2vw,19px); line-height:1.75; color:var(--ink); text-align:center; font-style:italic;}
+  .note-card .sign{text-align:center; margin-top:22px; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.08em; color:var(--gold); text-transform:uppercase;}
+
+  /* ============ PANEL 8 — CERTIFICATE ============ */
+  .cert{border:2px solid var(--gold); border-radius:var(--radius); padding:40px 32px; text-align:center; max-width:440px; background:var(--white);}
+  .cert .seal{width:60px; height:60px; border:2px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-family:'Fraunces',serif; font-size:20px; color:var(--gold);}
+  .cert .cert-sub{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; margin-bottom:20px;}
+  .cert .cert-body{color:var(--ink-soft); font-size:13.5px; line-height:1.7;}
+  .cert .cert-name{font-family:'Fraunces',serif; font-style:italic; font-size:21px; color:var(--ink); margin:18px 0 4px;}
+  .cert .edition{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold);}
+  #panel-cert{padding-bottom:70px;}
+  #panel-cert footer{position:absolute; bottom:18px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); letter-spacing:0.05em;}
+
+ /* ============ house card ============ */
+  #panel-acrylic-stands {
+    --cream: #FBF4E8;
+    --ink: #3A2E22;
+    position: relative;
+    padding: 60px 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--cream);
+    min-height: 100vh;
+    font-family: 'Fraunces', Georgia, serif;
+    color: var(--ink);
+  }
+  #panel-acrylic-stands .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.6;
+    margin-bottom: 6px;
+    z-index: 10;
+    position: relative;
+  }
+  #panel-acrylic-stands h2 {
+    position: relative;
+    z-index: 10;
+    font-size: clamp(24px, 4.5vw, 36px);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  #panel-acrylic-stands .lede {
+    position: relative;
+    z-index: 10;
+    max-width: 420px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 34px;
+    opacity: 0.75;
+  }
+  .stands-container {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    gap: 90px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    perspective: 1200px;
+  }
+  .acrylic-stand {
+    position: relative;
+    width: 240px;
+    height: 300px;
+    user-select: none;
+    cursor: pointer;
+  }
+  .acrylic-stand:hover .vector-stand-art {
+    transform: translateY(-4px);
+  }
+  .vector-stand-art {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    transition: transform 0.25s ease;
+    filter: drop-shadow(0 14px 18px rgba(58,46,34,0.16));
+  }
+
+  /* ---- Hidden reveal card ---- */
+  .acrylic-stand .hidden-card {
+    position: absolute;
+    width: 122px;
+    height: 138px;
+    padding: 7px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(58,46,34,0.28);
+    transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    opacity: 0;
+  }
+  .card-interior-frame {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-portrait { flex: 1; }
+  .card-interior-frame p {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 10.5px;
+    line-height: 1.35;
+    color: var(--ink);
+    font-weight: 700;
+    margin: 0;
+    padding: 8px 6px 9px;
+    text-align: center;
+    background: #fff;
+  }
+
+  .card-blue-variant {
+    top: 30px;
+    right: 24px;
+    transform: scale(0.4) rotate(0deg);
+    transform-origin: bottom left;
+  }
+  .card-blue-variant.card-1 { background: #7EB8D1; }
+  .card-blue-variant.card-2 { background: #B7D9EA; }
+  .card-blue-variant.card-3 { background: #5FA0C2; }
+  .card-blue-variant.card-4 { background: #9CCBE0; }
+
+  .card-blue-variant.card-1.active { opacity: 1; z-index: 6; transform: translate(112px, -55px) scale(1) rotate(13deg); }
+  .card-blue-variant.card-2.active { opacity: 1; z-index: 7; transform: translate(140px, -84px) scale(1) rotate(21deg); }
+  .card-blue-variant.card-3.active { opacity: 1; z-index: 8; transform: translate(150px, -28px) scale(1) rotate(-7deg); }
+  .card-blue-variant.card-4.active { opacity: 1; z-index: 9; transform: translate(88px, -98px) scale(1) rotate(-17deg); }
+
+  .card-yellow-variant {
+    bottom: 78px;
+    left: 14px;
+    transform: scale(0.4) rotate(0deg);
+    transform-origin: bottom right;
+  }
+  .card-yellow-variant.card-1 { background: #8B6544; }
+  .card-yellow-variant.card-2 { background: #A67C52; }
+  .card-yellow-variant.card-3 { background: #6E4F35; }
+  .card-yellow-variant.card-4 { background: #C79662; }
+
+  .card-yellow-variant.card-1.active { opacity: 1; z-index: 6; transform: translate(-118px, 18px) scale(1) rotate(-11deg); }
+  .card-yellow-variant.card-2.active { opacity: 1; z-index: 7; transform: translate(-148px, -8px) scale(1) rotate(-19deg); }
+  .card-yellow-variant.card-3.active { opacity: 1; z-index: 8; transform: translate(-152px, 46px) scale(1) rotate(8deg); }
+  .card-yellow-variant.card-4.active { opacity: 1; z-index: 9; transform: translate(-92px, -34px) scale(1) rotate(16deg); }
+
+  .stand-tip {
+    position: absolute;
+    bottom: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    opacity: 0.5;
+    white-space: nowrap;
+    z-index: 4;
+  }
+
+
+
+    /* ---- announcement / notice section ---- */
+  .notice{
+    border:1px solid var(--khaki-deep);
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:36px 32px;
+    text-align:center;
+    position:relative;
+  }
+  .notice::before{
+    content:'LIMITED RELEASE';
+    position:absolute;
+    top:-11px; left:50%; transform:translateX(-50%);
+    background:var(--gold);
+    color:var(--white);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.15em;
+    padding:5px 14px;
+    border-radius:20px;
+  }
+  .notice h2{font-size:clamp(24px,4vw,32px); margin:10px 0 16px;}
+  .notice p{color:var(--ink-soft); line-height:1.7; font-size:15px; max-width:480px; margin:0 auto;}
+  .notice .meta-row{
+    display:flex; justify-content:center; gap:28px; margin-top:26px;
+    flex-wrap:wrap;
+  }
+  .notice .meta-item{text-align:center;}
+  .notice .meta-item .k{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--gold); text-transform:uppercase; margin-bottom:4px;}
+  .notice .meta-item .v{font-family:'Fraunces',serif; font-size:16px;}
+ 
+  /* ---- product grid ---- */
+  .products{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:28px;
+  }
+  @media (max-width:640px){
+    .products{grid-template-columns:1fr 1fr; gap:14px;}
+    .product-card .card-body{padding:14px 14px 16px;}
+    .product-card h3{font-size:14.5px;}
+    .product-card .desc{font-size:11px; line-height:1.45; margin-bottom:8px;}
+    .product-card .item-no{font-size:8.5px; margin-bottom:4px;}
+    .product-card .price{font-size:10.5px;}
+    .product-card .tag{font-size:8px; padding:3px 7px;}
+    .product-card .price-row{padding-top:8px;}
+  }
+ 
+  /* justify-content:flex-start (instead of the .panel default of center) stops the
+     panel from centering overflow content — which was clipping equally off the top
+     AND bottom and hiding the 4th product card on short mobile viewports. */
+  #panel-products{ overflow-y:auto; align-items:stretch; justify-content:flex-start; padding-top:64px; padding-bottom:40px; }
+  #panel-products .products{ width:100%; max-width:640px; margin:0 auto; }
+#panel-products .header-block{ text-align:center; }
+
+  /* ---- easter-egg toast + floating hearts (shared across the whole page) ---- */
+  .ee-toast{
+    position:fixed; left:50%; bottom:32px; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:var(--cream); font-family:'Fraunces',serif; font-style:italic;
+    font-size:13.5px; padding:12px 22px; border-radius:30px; box-shadow:0 14px 30px -14px rgba(0,0,0,0.5);
+    opacity:0; pointer-events:none; transition:opacity .4s ease, transform .4s ease; z-index:9999; max-width:82vw; text-align:center;
+  }
+  .ee-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .ee-heart{
+    position:fixed; pointer-events:none; z-index:9998; font-size:18px; line-height:1;
+    animation:eeFloat 3.1s ease-in forwards;
+  }
+  @keyframes eeFloat{
+    0%{ transform:translateY(0) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(-70vh) rotate(30deg); opacity:0; }
+  }
+  .ee-clickable{ cursor:pointer; }
+  @media (max-width:640px){
+    #panel-hero, #panel-notice, #panel-book, #panel-stand, #panel-standees,
+    #panel-cards, #panel-scratch, #panel-counters, #panel-note, #panel-cert{
+      padding:44px 18px;
+    }
+    #panel-products{ padding-top:56px; padding-bottom:36px; padding-left:18px; padding-right:18px; }
+    .box-wrap{ width:150px; height:125px; margin-bottom:26px; }
+    .notice{ padding:28px 20px; }
+    .notice .meta-row{ gap:16px 22px; }
+    .note-card{ padding:30px 22px; }
+    .cert{ padding:30px 22px; }
+    .counters{ gap:14px; }
+    .counter-card{ padding:22px 20px; min-width:135px; }
+    .carousel-viewport{ width:min(280px,86vw); }
+    .scratch-wrap{ width:min(300px,90vw); }
+  }
+  .product-card{
+    background:var(--white);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 20px 40px -24px rgba(46,36,56,0.25);
+    border:1px solid rgba(46,36,56,0.06);
+    display:flex;
+    flex-direction:column;
+  }
+  .product-card .photo-slot{
+    aspect-ratio:1/1;
+    border-radius:0;
+    border-width:0 0 2px 0;
+    background-position:center top;
+  }
+  .product-card .card-body{padding:22px 22px 26px;}
+  .product-card .item-no{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px; letter-spacing:0.12em;
+    color:var(--gold); text-transform:uppercase;
+    margin-bottom:6px; display:block;
+  }
+  .product-card h3{font-size:19px; margin-bottom:6px;}
+  .product-card .desc{font-size:13.5px; color:var(--ink-soft); line-height:1.55; margin-bottom:14px;}
+  .product-card .price-row{
+    display:flex; justify-content:space-between; align-items:center;
+    border-top:1px dashed rgba(46,36,56,0.15);
+    padding-top:12px;
+  }
+  .product-card .price{font-family:'Fraunces',serif; font-size:15px; color:var(--ink);}
+  .product-card .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase;
+    background:var(--sage); color:var(--white);
+    padding:4px 9px; border-radius:20px;
+  }
+</style>
+</head>
+<body>
+
+<div id="dots"></div>
+
+<div id="snap">
+
+  <!-- PANEL 1 — HERO -->
+  <section class="panel" id="panel-hero" data-label="open">
+    <div class="checker-bg"></div>
+    <div class="box-wrap">
+      <div class="ribbon-v"></div>
+      <div class="box-base"></div>
+      <div class="ribbon-h"></div>
+      <div class="box-lid"></div>
+      <div class="bow"></div>
+    </div>
+    <h1>a set of one, made for you.</h1>
+    <p class="sub">Every piece Chhavi couldn't buy here — remade by hand, for three years of us.</p>
+    <p class="tap-hint">tap the box to open ✦</p>
+    <div class="scroll-cue">scroll to keep unwrapping ↓</div>
+  </section>
+
+  
+  <!-- ============ NOTICE / ANNOUNCEMENT ============ -->
+  <section class="panel" id="panel-notice" data-label="notice">
+    <div class="notice">
+      <h2>Official Notice — 2026 Edition</h2>
+      <p>
+        <!-- EDIT THIS: swap in your own framing / event name / inside joke if you'd like -->
+        This is a one-of-one release. So what if the official merchandise can't be shipped to India? I can make something even better something truly one of one, made only for you. Something no other girl in the world has. You, Chhavi, deserve the real thing, but maybe this is even better: something crafted by hand, with love, just for you.
+      </p>
+      <div class="meta-row">
+        <div class="meta-item"><div class="k">Edition</div><div class="v">1 of 1</div></div>
+        <div class="meta-item"><div class="k">For</div><div class="v">Chhavi</div></div>
+        <div class="meta-item"><div class="k">Since</div><div class="v">3 years</div></div>
+        <div class="meta-item"><div class="k">Drop date</div><div class="v">July 04</div></div>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- ============ PRODUCT GRID INTRO ============ -->
+  <section class="panel" id="panel-products" data-label="collection">
+    <div class="header-block">
+      <span class="eyebrow">The Collection</span>
+      <h2>four pieces, one story.</h2>
+      <p>Every item from the original set, remade — same feeling, different meaning.</p>
+    </div>
+ 
+    <div class="products">
+      <div class="product-card">
+        <div class="photo-slot" data-photo="productPhotobook" style="aspect-ratio:1/1;">
+          <div class="slot-icon">🖼️</div>
+          <div class="slot-label">Product shot — Photobook cover</div>
+          <div class="slot-sub">Square photo of the two of you, or a favorite single portrait</div>
+        </div>
+        <div class="card-body">
+          <span class="item-no">ITEM 01</span>
+          <h3>Mini Photobook</h3>
+          <p class="desc">A pocket-sized flip-through of us — every page, a memory worth keeping.</p>
+          <div class="price-row"><span class="price">priceless, obviously</span><span class="tag">In stock</span></div>
+        </div>
+      </div>
+ 
+      <div class="product-card">
+        <div class="photo-slot" data-photo="productSwingStand" style="aspect-ratio:1/1;">
+          <div class="slot-icon">🖼️</div>
+          <div class="slot-label">Product shot — Acrylic stand</div>
+          <div class="slot-sub">A clean portrait photo, ideally full body or 3/4</div>
+        </div>
+        <div class="card-body">
+          <span class="item-no">ITEM 02</span>
+          <h3>Acrylic ID Swing Stand</h3>
+          <p class="desc">make it your key chain</p>
+          <div class="price-row"><span class="price">not for sale</span><span class="tag">In stock</span></div>
+        </div>
+      </div>
+ 
+      <div class="product-card">
+        <div class="photo-slot" data-photo="productPostcards" style="aspect-ratio:1/1;">
+          <div class="slot-icon">🖼️</div>
+          <div class="slot-label">Product shot — Postcard set</div>
+          <div class="slot-sub">Any candid or favorite photo works well here</div>
+        </div>
+        <div class="card-body">
+          <span class="item-no">ITEM 03</span>
+          <h3>Folding Postcard Set</h3>
+          <p class="desc">I hate when you look at other people's photos.</p>
+          <div class="price-row"><span class="price">worth more than 15,000 KRW</span><span class="tag">In stock</span></div>
+        </div>
+      </div>
+ 
+      <div class="product-card">
+        <div class="photo-slot" data-photo="productCutout" style="aspect-ratio:1/1;">
+          <div class="slot-icon">🖼️</div>
+          <div class="slot-label">Product shot — Paper cutout stand</div>
+          <div class="slot-sub">A simple cutout photo, mounted to stand on its own</div>
+        </div>
+        <div class="card-body">
+          <span class="item-no">ITEM 04</span>
+          <h3>Paper Cutout Stand</h3>
+          <p class="desc">A tiny paper version of you, propped up wherever I need you close.</p>
+          <div class="price-row"><span class="price">reserved for her</span><span class="tag">In stock</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+
+
+  <!-- <div class="cover-spread">
+  <div class="cover-panel cover-front">
+    <div class="cover-text">
+      <div class="line1">ROOMMATE</div>
+      <div class="line2">Chhavi &amp; Us</div>
+      <div class="line3">2026 FANMEETING</div>
+    </div>
+  </div>
+  <div class="cover-panel cover-back">
+    <div class="cover-text">
+      <div class="line1">ROOMMATE</div>
+      <div class="line2">Chhavi &amp; Us</div>
+      <div class="line3">2026 FANMEETING</div>
+    </div>
+    <div class="back-badge">
+      <svg width="28" height="24" viewBox="0 0 28 24" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="14,2 26,12 22,12 22,22 6,22 6,12 2,12" fill="none" stroke="#1E8449" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</div> -->
+  <!-- PANEL 2 — PHOTOBOOK -->
+  <section class="panel" id="panel-book" data-label="book">
+    <span class="eyebrow">Item 01</span>
+    <h2>tap the book to open it.</h2>
+    <p class="lede">Then flip through — every page is one of us.</p>
+    <div class="book-stage closed" id="bookStage">
+      <div class="book-flip" id="bookFlip">
+        <div class="book-cover-face">
+          <div class="house-tag" id="bookCoverTag">
+            <div class="chimney"></div>
+            <div class="roof"></div>
+            <div class="body">
+              <div class="circle-window"></div>
+              <div class="cover-text">
+                <div class="line1">ROOMMATE</div>
+                <div class="line2">Chhavi &amp; Us</div>
+                <div class="line3">2026 FANMEETING</div>
+              </div>
+              <div class="door"></div>
+              <div class="steps"><div></div><div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="book-inner-face"></div>
+      </div>
+      <div class="pages-wrap" id="pagesWrap"></div>
+    </div>
+    <div class="book-controls">
+      <button id="bookPrev" aria-label="Previous page">←</button>
+      <span class="page-count" id="bookCount">cover</span>
+      <button id="bookNext" aria-label="Next page">→</button>
+    </div>
+  </section>
+
+  <!-- PANEL 3 — SWINGING STAND -->
+  <section class="panel" id="panel-stand" data-label="stand">
+    <span class="eyebrow">Item 02</span>
+    <h2>the swing stand.</h2>
+    <p class="lede">Drag it side to side. Let go and it swings back. Tap once to flip it over.</p>
+    <div class="swing-rig">
+      <div class="ring"></div>
+      <div class="hook"></div>
+      <div class="swing-house" id="swingHouse">
+        <div class="inner3d">
+          <div class="stand-face">
+            <div class="house-tag">
+              <div class="chimney"></div>
+              <div class="roof"></div>
+              <div class="body">
+                <div class="dream-brand">NCT DREAM</div>
+                <div class="stand-photo-stage">
+                  <div class="photo-slot base-photo" data-photo="chhaviPhoto"><div class="slot-icon">🖼️</div><div class="slot-label">drag to reveal</div></div>
+                  <div class="photo-slot reveal-photo reveal-renjun" data-photo="renjunPhoto"><span class="member-tag">RENJUN</span></div>
+                  <div class="photo-slot reveal-photo reveal-chenle" data-photo="chenlePhoto"><span class="member-tag">CHENLE</span></div>
+                </div>
+                <div class="door"></div>
+              </div>
+            </div>
+          </div>
+          <div class="stand-back">
+            <span class="eyebrow" style="margin-bottom:10px;">NCT DREAM · for Chhavi</span>
+            <p><!-- EDIT THIS: your real message -->"Three years in, and you're still the only merch I'd wait in line for. Happy almost-birthday. I love you."</p>
+            <span class="eyebrow" style="margin-top:14px;">— always</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="swing-hint">drag to swing · tap to flip</div>
+  </section>
+
+  <!-- PANEL — DIE-CUT ACRYLIC STANDEES -->
+  <section class="panel" id="panel-standees" data-label="standees">
+    <span class="eyebrow">chhavi ji NCT dream</span>
+    <h2>the standee lineup.</h2>
+    <p class="lede">Cut, outlined, and standing tall — just like the real ones.</p>
+    <div class="standee-row">
+
+      <div class="standee-card">
+        <div class="standee-cutout" data-standee="renjunCutout">
+          <div class="placeholder-note">Renjun cutout PNG</div>
+        </div>
+        <div class="standee-base"><span>ROOMMATE<br>RENJUN</span></div>
+      </div>
+
+      <div class="standee-card">
+        <div class="standee-cutout" data-standee="chenleCutout">
+          <div class="placeholder-note">Chenle cutout PNG</div>
+        </div>
+        <div class="standee-base"><span>ROOMMATE<br>CHENLE</span></div>
+      </div>
+
+      <div class="standee-card">
+        <div class="standee-cutout" data-standee="groupCutout1">
+          <div class="placeholder-note">Group photo 1 PNG</div>
+        </div>
+        <div class="standee-base"><span>ROOMMATE<br>CHHAVI</span></div>
+      </div>
+
+      <div class="standee-card">
+        <div class="standee-cutout" data-standee="groupCutout2">
+          <div class="placeholder-note">Group photo 2 PNG</div>
+        </div>
+        <div class="standee-base"><span>ROOMMATE<br>haechan</span></div>
+      </div>
+
+       <div class="standee-card">
+        <div class="standee-cutout" data-standee="groupCutout3">
+          <div class="placeholder-note">Group photo 1 PNG</div>
+        </div>
+        <div class="standee-base"><span>ROOMMATE<br>Chenle</span></div>
+      </div>
+        <div class="standee-card">
+        <div class="standee-cutout" data-standee="groupCutout4">
+          <div class="placeholder-note">Group photo 1 PNG</div>
+        </div>
+        <div class="standee-base"><span>ROOMMATE<br>Jaemin</span></div>
+      </div>
+
+    </div>
+  </section>
+
+<section class="panel" id="panel-acrylic-stands" data-label="stands">
+  <span class="eyebrow">Keepsakes</span>
+  <h2>Acrylic Stand Displays</h2>
+  <p class="lede">Tap a house — keep tapping to fan out up to 4 hidden cards, tap once more to tuck them away.</p>
+
+  <div class="stands-container">
+
+    <!-- ============ STAND 1 : BLUE FOX HOUSE ============ -->
+    <div class="acrylic-stand stand-blue" data-count="0" data-max="4" onclick="handleStandTap(this)">
+
+      <div class="hidden-card card-blue-variant card-1">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#BFE0EA"/>
+            <path d="M50,62 C50,62 40,48 28,48 C19,48 12,55 12,65 C12,76 24,85 50,98 C76,85 88,76 88,65 C88,55 81,48 72,48 C60,48 50,62 50,62 Z" fill="#FFFFFF" stroke="#3A2E22" stroke-width="3"/>
+            <ellipse cx="41" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="59" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="30" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <ellipse cx="70" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <path d="M46,74 Q50,78 54,74" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"You make every single day feel bright and beautiful. ✨"</p>
+        </div>
+      </div>
+
+      <div class="hidden-card card-blue-variant card-2">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#DCEEF4"/>
+            <path d="M50,62 C50,62 40,48 28,48 C19,48 12,55 12,65 C12,76 24,85 50,98 C76,85 88,76 88,65 C88,55 81,48 72,48 C60,48 50,62 50,62 Z" fill="#FFFFFF" stroke="#3A2E22" stroke-width="3"/>
+            <ellipse cx="41" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="59" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="30" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <ellipse cx="70" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <path d="M46,74 Q50,78 54,74" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"Home is wherever I'm holding your paw. 🐾"</p>
+        </div>
+      </div>
+
+      <div class="hidden-card card-blue-variant card-3">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#AFCFE0"/>
+            <path d="M50,62 C50,62 40,48 28,48 C19,48 12,55 12,65 C12,76 24,85 50,98 C76,85 88,76 88,65 C88,55 81,48 72,48 C60,48 50,62 50,62 Z" fill="#FFFFFF" stroke="#3A2E22" stroke-width="3"/>
+            <ellipse cx="41" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="59" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="30" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <ellipse cx="70" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <path d="M46,74 Q50,78 54,74" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"Still my favorite hello, every single time. 💙"</p>
+        </div>
+      </div>
+
+      <div class="hidden-card card-blue-variant card-4">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#CDE6EF"/>
+            <path d="M50,62 C50,62 40,48 28,48 C19,48 12,55 12,65 C12,76 24,85 50,98 C76,85 88,76 88,65 C88,55 81,48 72,48 C60,48 50,62 50,62 Z" fill="#FFFFFF" stroke="#3A2E22" stroke-width="3"/>
+            <ellipse cx="41" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="59" cy="66" rx="3.4" ry="5" fill="#3A2E22"/>
+            <ellipse cx="30" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <ellipse cx="70" cy="76" rx="6" ry="3.5" fill="#FFC9BE" opacity="0.8"/>
+            <path d="M46,74 Q50,78 54,74" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"P.S. I'd choose this house (and you) again and again."</p>
+        </div>
+      </div>
+
+      <div class="vector-stand-art">
+        <svg viewBox="0 0 260 320" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="blueCheck" width="20" height="20" patternUnits="userSpaceOnUse">
+              <rect width="20" height="20" fill="#EAF6F5"/>
+              <rect width="10" height="10" fill="#BFE3DE"/>
+              <rect x="10" y="10" width="10" height="10" fill="#BFE3DE"/>
+            </pattern>
+          </defs>
+
+          <!-- base -->
+          <path d="M35,236 A95,95 0 0,0 225,236 Z" fill="#A9DCD5" stroke="#3A2E22" stroke-width="3.5"/>
+          <path d="M75,270 q6,-9 12,0" fill="none" stroke="#5FA98F" stroke-width="3" stroke-linecap="round"/>
+          <path d="M180,278 q6,-9 12,0" fill="none" stroke="#5FA98F" stroke-width="3" stroke-linecap="round"/>
+          <path d="M130,296 q6,-9 12,0" fill="none" stroke="#5FA98F" stroke-width="3" stroke-linecap="round"/>
+          <rect x="103" y="223" width="54" height="13" rx="6" fill="#FFFFFF" stroke="#3A2E22" stroke-width="2.5"/>
+
+          <!-- bushes -->
+          <g stroke="#3A2E22" stroke-width="3" stroke-linejoin="round">
+            <circle cx="46" cy="238" r="19" fill="#EF9B5E"/>
+            <circle cx="27" cy="248" r="15" fill="#EF9B5E"/>
+            <circle cx="63" cy="248" r="15" fill="#EF9B5E"/>
+            <circle cx="214" cy="238" r="19" fill="#EF9B5E"/>
+            <circle cx="233" cy="248" r="15" fill="#EF9B5E"/>
+            <circle cx="197" cy="248" r="15" fill="#EF9B5E"/>
+          </g>
+
+          <!-- chimney (drawn under roof so it pokes through) -->
+          <rect x="168" y="55" width="16" height="42" rx="3" fill="#E8935A" stroke="#3A2E22" stroke-width="3"/>
+
+          <!-- roof -->
+          <polygon points="50,124 130,46 210,124" fill="#FFE9A8" stroke="#3A2E22" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="95,78 107,90 95,102 83,90" fill="#EAF6F5" stroke="#3A2E22" stroke-width="2.5" stroke-linejoin="round"/>
+          <polygon points="165,78 177,90 165,102 153,90" fill="#EAF6F5" stroke="#3A2E22" stroke-width="2.5" stroke-linejoin="round"/>
+
+          <!-- house body -->
+          <rect x="60" y="122" width="140" height="104" rx="14" fill="url(#blueCheck)" stroke="#3A2E22" stroke-width="3"/>
+
+          <!-- heart window / fox face -->
+          <path d="M130,160 C130,160 118,145 104,145 C93,145 85,154 85,165 C85,177 98,186 130,203 C162,186 175,177 175,165 C175,154 167,145 156,145 C142,145 130,160 130,160 Z" fill="#FFFFFF" stroke="#7EB8D1" stroke-width="4"/>
+          <ellipse cx="119" cy="169" rx="3" ry="4.5" fill="#3A2E22"/>
+          <ellipse cx="141" cy="169" rx="3" ry="4.5" fill="#3A2E22"/>
+          <ellipse cx="109" cy="180" rx="5" ry="3" fill="#FFC9BE" opacity="0.75"/>
+          <ellipse cx="151" cy="180" rx="5" ry="3" fill="#FFC9BE" opacity="0.75"/>
+          <path d="M126,176 Q130,179 134,176" stroke="#3A2E22" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <g stroke="#B9CFD3" stroke-width="1.3" stroke-linecap="round">
+            <line x1="95" y1="172" x2="108" y2="170"/>
+            <line x1="95" y1="178" x2="108" y2="176"/>
+            <line x1="165" y1="172" x2="152" y2="170"/>
+            <line x1="165" y1="178" x2="152" y2="176"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ============ STAND 2 : YELLOW SMILING HOUSE ============ -->
+    <div class="acrylic-stand stand-yellow" data-count="0" data-max="4" onclick="handleStandTap(this)">
+
+      <div class="hidden-card card-yellow-variant card-1">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#FFF3C4"/>
+            <path d="M28,38 Q50,16 72,38" fill="none" stroke="#8B6544" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="50" cy="55" r="26" fill="#FFE0BB" stroke="#3A2E22" stroke-width="2.5"/>
+            <ellipse cx="43" cy="53" rx="3" ry="4" fill="#3A2E22"/>
+            <path d="M56,49 q5,-3 8,1" stroke="#3A2E22" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="35" cy="63" rx="5" ry="3" fill="#FFB199" opacity="0.8"/>
+            <path d="M46,63 Q52,69 60,62" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"Three years down, and forever to go. Happy anniversary! ❤️"</p>
+        </div>
+      </div>
+
+      <div class="hidden-card card-yellow-variant card-2">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#FFE9B0"/>
+            <path d="M28,38 Q50,16 72,38" fill="none" stroke="#8B6544" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="50" cy="55" r="26" fill="#FFE0BB" stroke="#3A2E22" stroke-width="2.5"/>
+            <ellipse cx="43" cy="53" rx="3" ry="4" fill="#3A2E22"/>
+            <path d="M56,49 q5,-3 8,1" stroke="#3A2E22" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="35" cy="63" rx="5" ry="3" fill="#FFB199" opacity="0.8"/>
+            <path d="M46,63 Q52,69 60,62" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"You + me + this tiny house = everything I need."</p>
+        </div>
+      </div>
+
+      <div class="hidden-card card-yellow-variant card-3">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#FFDD8F"/>
+            <path d="M28,38 Q50,16 72,38" fill="none" stroke="#8B6544" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="50" cy="55" r="26" fill="#FFE0BB" stroke="#3A2E22" stroke-width="2.5"/>
+            <ellipse cx="43" cy="53" rx="3" ry="4" fill="#3A2E22"/>
+            <path d="M56,49 q5,-3 8,1" stroke="#3A2E22" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="35" cy="63" rx="5" ry="3" fill="#FFB199" opacity="0.8"/>
+            <path d="M46,63 Q52,69 60,62" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"Every season looks better with you in it. 🌼"</p>
+        </div>
+      </div>
+
+      <div class="hidden-card card-yellow-variant card-4">
+        <div class="card-interior-frame">
+          <svg class="card-portrait" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="90" fill="#FFF0C6"/>
+            <path d="M28,38 Q50,16 72,38" fill="none" stroke="#8B6544" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="50" cy="55" r="26" fill="#FFE0BB" stroke="#3A2E22" stroke-width="2.5"/>
+            <ellipse cx="43" cy="53" rx="3" ry="4" fill="#3A2E22"/>
+            <path d="M56,49 q5,-3 8,1" stroke="#3A2E22" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="35" cy="63" rx="5" ry="3" fill="#FFB199" opacity="0.8"/>
+            <path d="M46,63 Q52,69 60,62" stroke="#3A2E22" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p>"Here's to all the ordinary days that felt extraordinary."</p>
+        </div>
+      </div>
+
+      <div class="vector-stand-art">
+        <svg viewBox="0 0 260 320" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="yellowDiamond" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="22" height="22" fill="#FFF6D8"/>
+              <rect width="11" height="11" fill="#FCE8A0"/>
+            </pattern>
+          </defs>
+
+          <!-- base -->
+          <path d="M35,236 A95,95 0 0,0 225,236 Z" fill="#A9DCD5" stroke="#3A2E22" stroke-width="3.5"/>
+          <path d="M75,270 q6,-9 12,0" fill="none" stroke="#5FA98F" stroke-width="3" stroke-linecap="round"/>
+          <path d="M180,278 q6,-9 12,0" fill="none" stroke="#5FA98F" stroke-width="3" stroke-linecap="round"/>
+          <path d="M130,296 q6,-9 12,0" fill="none" stroke="#5FA98F" stroke-width="3" stroke-linecap="round"/>
+          <rect x="103" y="223" width="54" height="13" rx="6" fill="#FFFFFF" stroke="#3A2E22" stroke-width="2.5"/>
+
+          <!-- flower bushes -->
+          <g stroke="#3A2E22" stroke-width="2">
+            <g transform="translate(38,240)">
+              <circle cx="0" cy="-9" r="6" fill="#C6A6E0"/>
+              <circle cx="9" cy="0" r="6" fill="#B79CC9"/>
+              <circle cx="-9" cy="0" r="6" fill="#C6A6E0"/>
+              <circle cx="0" cy="9" r="6" fill="#A87FC7"/>
+              <circle cx="0" cy="0" r="4" fill="#FCE8A0" stroke-width="1.5"/>
+            </g>
+            <g transform="translate(60,252)">
+              <circle cx="0" cy="-7" r="5" fill="#B79CC9"/>
+              <circle cx="7" cy="0" r="5" fill="#C6A6E0"/>
+              <circle cx="-7" cy="0" r="5" fill="#B79CC9"/>
+              <circle cx="0" cy="7" r="5" fill="#A87FC7"/>
+              <circle cx="0" cy="0" r="3.2" fill="#FCE8A0" stroke-width="1.5"/>
+            </g>
+            <g transform="translate(222,240)">
+              <circle cx="0" cy="-9" r="6" fill="#C6A6E0"/>
+              <circle cx="9" cy="0" r="6" fill="#A87FC7"/>
+              <circle cx="-9" cy="0" r="6" fill="#C6A6E0"/>
+              <circle cx="0" cy="9" r="6" fill="#B79CC9"/>
+              <circle cx="0" cy="0" r="4" fill="#FCE8A0" stroke-width="1.5"/>
+            </g>
+            <g transform="translate(200,252)">
+              <circle cx="0" cy="-7" r="5" fill="#B79CC9"/>
+              <circle cx="7" cy="0" r="5" fill="#C6A6E0"/>
+              <circle cx="-7" cy="0" r="5" fill="#B79CC9"/>
+              <circle cx="0" cy="7" r="5" fill="#A87FC7"/>
+              <circle cx="0" cy="0" r="3.2" fill="#FCE8A0" stroke-width="1.5"/>
+            </g>
+          </g>
+
+          <!-- chimney -->
+          <rect x="168" y="55" width="16" height="42" rx="3" fill="#B79CC9" stroke="#3A2E22" stroke-width="3"/>
+
+          <!-- roof -->
+          <polygon points="50,124 130,46 210,124" fill="#FFE9A8" stroke="#3A2E22" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="95,78 107,90 95,102 83,90" fill="#FFFDF0" stroke="#3A2E22" stroke-width="2.5" stroke-linejoin="round"/>
+          <polygon points="165,78 177,90 165,102 153,90" fill="#FFFDF0" stroke="#3A2E22" stroke-width="2.5" stroke-linejoin="round"/>
+
+          <!-- house body -->
+          <rect x="60" y="122" width="140" height="104" rx="14" fill="url(#yellowDiamond)" stroke="#3A2E22" stroke-width="3"/>
+
+          <!-- heart window / smiling face -->
+          <path d="M130,160 C130,160 118,145 104,145 C93,145 85,154 85,165 C85,177 98,186 130,203 C162,186 175,177 175,165 C175,154 167,145 156,145 C142,145 130,160 130,160 Z" fill="#FDE8A8" stroke="#E8B93A" stroke-width="4"/>
+          <path d="M104,160 Q130,134 156,160" fill="none" stroke="#8B6544" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="131" cy="180" r="21" fill="#FFE0BB" stroke="#3A2E22" stroke-width="2"/>
+          <ellipse cx="125" cy="176" rx="2.4" ry="3.4" fill="#3A2E22"/>
+          <path d="M136,172 q4,-2.6 7,1" stroke="#3A2E22" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <ellipse cx="118" cy="185" rx="4.5" ry="2.7" fill="#FFB199" opacity="0.8"/>
+          <path d="M123,187 Q130,192 139,185" stroke="#3A2E22" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function handleStandTap(el) {
+    const max = parseInt(el.dataset.max || '4', 10);
+    let count = parseInt(el.dataset.count || '0', 10);
+    count = (count + 1) % (max + 1);
+    el.dataset.count = count;
+
+    const cards = el.querySelectorAll('.hidden-card');
+    cards.forEach((card, idx) => {
+      card.classList.toggle('active', idx < count);
+    });
+  }
+</script>
+
+  <!-- PANEL 4 — POSTCARDS -->
+  <section class="panel" id="panel-cards" data-label="postcards">
+    <span class="eyebrow">Item 03</span>
+    <h2>the postcard set.</h2>
+    <p class="lede">Swipe or tap through — four scenes, one story.</p>
+    <div class="carousel-viewport">
+      <div class="carousel-track" id="carouselTrack">
+       <div class="card"><div class="photo-slot" data-photo="postcard1"><div class="slot-icon">📮</div><div class="slot-label">Postcard 1</div></div><p class="line">"chhavi, i hate it when you look at other guys."</p></div>
+        <div class="card"><div class="photo-slot" data-photo="postcard2"><div class="slot-icon">📮</div><div class="slot-label">Postcard 2</div></div><p class="line">"so putting their faces here wasn't easy for me."</p></div>
+        <div class="card"><div class="photo-slot" data-photo="postcard3"><div class="slot-icon">📮</div><div class="slot-label">Postcard 3</div></div><p class="line">"but what won't I do for you."</p></div>
+        <div class="card"><div class="photo-slot" data-photo="postcard4"><div class="slot-icon">📮</div><div class="slot-label">Postcard 4</div></div><p class="line">"i love you way too much.<br><span class="sign-off">— Aman</span></p></div>
+      </div>
+    </div>
+    <div class="carousel-controls">
+      <button id="cardPrev">←</button>
+      <div class="carousel-dots" id="carouselDots"></div>
+      <button id="cardNext">→</button>
+    </div>
+  </section>
+
+  <!-- PANEL 5 — SCRATCH CARD -->
+  <section class="panel" id="panel-scratch" data-label="scratch">
+    <span class="eyebrow">Item 04</span>
+    <h2>scratch it off.</h2>
+    <p class="lede">There's a message hiding underneath.</p>
+    <div class="scratch-wrap" id="scratchWrap">
+      <div class="scratch-message"><p><!-- EDIT THIS --> "I kept this one just for you the merch drop you couldn't get, rebuilt by hand for the girl who's had all of me for the past three years.
+        
+        I love you, Chhavi. I'm sorry I made you cry"</p></div>
+      <canvas class="scratch-canvas" id="scratchCanvas"></canvas>
+    </div>
+    <div class="scratch-hint">scratch or swipe the gold panel</div>
+  </section>
+
+  <!-- PANEL 6 — COUNTERS -->
+  <section class="panel" id="panel-counters" data-label="counters">
+    <span class="eyebrow">Numbers that matter</span>
+    <h2>where we're at.</h2>
+    <div class="counters">
+      <div class="counter-card"><span class="eyebrow">Together for</span><div class="big-num" id="daysTogether">—</div><div class="caption">days and counting</div></div>
+      <div class="counter-card"><span class="eyebrow">Birthday countdown</span><div class="big-num" id="daysToBday">—</div><div class="caption">days until July 14</div></div>
+    </div>
+  </section>
+
+  <!-- PANEL 7 — NOTE -->
+  <section class="panel" id="panel-note" data-label="note">
+    <div class="note-card">
+      <span class="eyebrow" style="display:block; text-align:center; margin-bottom:16px;">A note, tucked inside the box</span>
+      <p class="msg"><!-- EDIT THIS --> "I made something no store ever could. Something one of one. Something that exists only because you do.
+
+Every page holds a little piece of us. Every detail was made while thinking about your smile.
+
+Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my life. I hope this reminds you, every time you open it, just how deeply you're loved.
+
+
+"</p>
+      <div class="sign">I love you, always.</div>
+      <div class ="sign"> — yours, aman</div>
+    </div>
+  </section>
+
+  <!-- PANEL 8 — CERTIFICATE -->
+  <section class="panel" id="panel-cert" data-label="certificate">
+    <div class="cert">
+      <div class="seal">✦</div>
+      <h2>Certificate of Authenticity</h2>
+      <div class="cert-sub">Limited Edition — Not For Resale</div>
+      <div class="cert-body">This confirms that the accompanying set was designed, assembled, and delivered exclusively for one recipient. No two copies exist.</div>
+      <div class="cert-name">Chhavi</div>
+      <div class="edition">Edition No. 1 / 1</div>
+    </div>
+    <footer>made with care, not a factory — 2026</footer>
+  </section>
+
+</div>
+
+<script>
+  /* ============================================================
+     PASTE YOUR PHOTOS HERE — image URL or base64 data URL.
+     Leave "" to keep the dashed placeholder.
+  ============================================================ */
+  const PHOTOS = {
+    productPhotobook: "./assets/product-photobook.png",
+    productSwingStand: "./assets/product-swingstand.png",
+    productPostcards: "./assets/product-postcards.png",
+    productCutout: "./assets/product-cutout.png",
+    photobookPages: [
+      "./assets/page1.jpg",
+      "./assets/page2.jpg",
+      "./assets/page3.jpg",
+      "./assets/page4.jpg",
+      "./assets/page5.jpg",
+      "./assets/page6.jpg"
+    ],
+    chhaviPhoto: "./assets/chhavi.jpg",
+    renjunPhoto: "./assets/renjun.jpg",
+    chenlePhoto: "./assets/chenle.jpg",
+    postcard1: "./assets/photo_6_2026-07-03_23-10-21.jpg",
+    postcard2: "./assets/photo_11_2026-07-03_23-10-21.jpg",
+    postcard3: "./assets/images (12).jpg",
+    postcard4: "./assets/FN0ZkRTVkAMADw7.jpg"
+  };
+
+  document.querySelectorAll('[data-photo]').forEach(el => {
+    const url = PHOTOS[el.getAttribute('data-photo')];
+    if (url) { el.style.backgroundImage = `url('${url}')`; el.classList.add('filled'); }
+  });
+
+  const STANDEES = {
+    renjunCutout: "./assets/renjun-cutout.png",
+    chenleCutout: "./assets/chenle-cutout.png",
+    groupCutout1: "./assets/group1-cutout.png",
+    groupCutout2: "./assets/group2-cutout.png",
+    groupCutout3: "./assets/group3-cutout.png",
+    groupCutout4: "./assets/group4-cutout.png"
+  };
+  document.querySelectorAll('[data-standee]').forEach(el => {
+    const url = STANDEES[el.getAttribute('data-standee')];
+    if (url) { el.innerHTML = `<img src="${url}" alt="">`; }
+  });
+
+  /* ---- side dots + section labels ---- */
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  const dotsWrap = document.getElementById('dots');
+  panels.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', p.dataset.label);
+    b.addEventListener('click', () => p.scrollIntoView({behavior:'smooth'}));
+    dotsWrap.appendChild(b);
+  });
+  const dotEls = Array.from(dotsWrap.children);
+  const snap = document.getElementById('snap');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = panels.indexOf(e.target);
+        dotEls.forEach(d => d.classList.remove('active'));
+        dotEls[idx].classList.add('active');
+      }
+    });
+  }, { root: snap, threshold: 0.6 });
+  panels.forEach(p => io.observe(p));
+
+  /* ---- Panel 1: box open ---- */
+  document.getElementById('panel-hero').addEventListener('click', function(){
+    if (this.classList.contains('opened')) return;
+    this.classList.add('opened');
+    setTimeout(() => {
+      document.getElementById('panel-notice').scrollIntoView({ behavior: 'smooth' });
+    }, 950);
+  });
+
+  /* ---- Panel 2: photobook ---- */
+  const bookStage = document.getElementById('bookStage');
+  const pagesWrap = document.getElementById('pagesWrap');
+  const bookCount = document.getElementById('bookCount');
+  const total = PHOTOS.photobookPages.length + 1; // +1 for the back cover
+  PHOTOS.photobookPages.forEach((url, i) => {
+    const page = document.createElement('div');
+    page.className = 'page';
+    page.style.zIndex = total - i;
+    const slot = document.createElement('div');
+    slot.className = 'photo-slot';
+    if (url) { slot.style.backgroundImage = `url('${url}')`; slot.classList.add('filled'); }
+    else { slot.innerHTML = `<div class="slot-icon">📷</div><div class="slot-label">Page ${i+1}</div>`; }
+    page.appendChild(slot);
+    const tag = document.createElement('div');
+    tag.className = 'page-tag';
+    tag.textContent = `pg ${i+1}/${total}`;
+    page.appendChild(tag);
+    pagesWrap.appendChild(page);
+  });
+
+  // ---- back cover: closes the book after the last page ----
+  const backCover = document.createElement('div');
+  backCover.className = 'page page-back';
+  backCover.style.zIndex = 0;
+  backCover.innerHTML = `
+    <div class="cover-text">
+      <div class="line1">ROOMMATE</div>
+      <div class="line2">Chhavi &amp; Us</div>
+      <div class="line3">2026 FANMEETING</div>
+    </div>
+    <div class="badge">
+      <svg width="28" height="24" viewBox="0 0 28 24" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="14,2 26,12 22,12 22,22 6,22 6,12 2,12" fill="none" stroke="#1E8449" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  `;
+  pagesWrap.appendChild(backCover);
+  let currentPage = -1; // -1 = cover still closed conceptually
+  const pageEls = () => Array.from(pagesWrap.querySelectorAll('.page'));
+  function renderBook(targetIndex){
+    pageEls().forEach((p, i) => {
+      const isFlipped = i <= currentPage;
+      p.style.transform = isFlipped ? 'rotateY(-160deg)' : 'rotateY(0deg)';
+      p.style.zIndex = (targetIndex !== undefined && i === targetIndex) ? 2000 : (isFlipped ? i : (1000 - i));
+    });
+    bookCount.textContent = currentPage < 0 ? 'cover' : `pg ${currentPage + 1} / ${total}`;
+
+    if (targetIndex !== undefined) {
+      clearTimeout(window.__bookFlipTimer);
+      window.__bookFlipTimer = setTimeout(() => {
+        const p = pageEls()[targetIndex];
+        if (p) {
+          const isFlipped = targetIndex <= currentPage;
+          p.style.zIndex = isFlipped ? targetIndex : (1000 - targetIndex);
+        }
+      }, 720);
+    }
+  }
+  document.getElementById('bookCoverTag').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!bookStage.classList.contains('open')) { bookStage.classList.remove('closed'); bookStage.classList.add('open'); currentPage = -1; renderBook(); }
+  });
+  document.getElementById('bookNext').addEventListener('click', () => {
+    if (!bookStage.classList.contains('open')) { bookStage.classList.remove('closed'); bookStage.classList.add('open'); }
+    if (currentPage < total - 1) { currentPage++; renderBook(currentPage); }
+  });
+  document.getElementById('bookPrev').addEventListener('click', () => {
+    if (currentPage > -1) { const target = currentPage; currentPage--; renderBook(target); }
+  });
+  renderBook();
+
+  /* ---- Panel 3: swinging stand (drag to swing, tap to flip) ---- */
+  const swingHouse = document.getElementById('swingHouse');
+  const revealRenjun = swingHouse.querySelector('.reveal-renjun');
+  const revealChenle = swingHouse.querySelector('.reveal-chenle');
+  let dragging = false, startX = 0, moved = false, currentAngle = 0;
+  function pointerDown(e){
+    dragging = true; moved = false;
+    startX = e.clientX;
+    swingHouse.style.transition = 'none';
+  }
+  function pointerMove(e){
+    if (!dragging) return;
+    const x = e.clientX;
+    const delta = x - startX;
+    if (Math.abs(delta) > 4) moved = true;
+    currentAngle = Math.max(-35, Math.min(35, delta / 3));
+    swingHouse.style.transform = `rotate(${currentAngle}deg)`;
+
+    const threshold = 30;
+    if (delta < -threshold) { revealRenjun.classList.add('active'); revealChenle.classList.remove('active'); }
+    else if (delta > threshold) { revealChenle.classList.add('active'); revealRenjun.classList.remove('active'); }
+    else { revealRenjun.classList.remove('active'); revealChenle.classList.remove('active'); }
+  }
+  function pointerUp(){
+    if (!dragging) return;
+    dragging = false;
+    swingHouse.style.transition = 'transform 1.1s cubic-bezier(.34,1.56,.64,1)';
+    swingHouse.style.transform = 'rotate(0deg)';
+    revealRenjun.classList.remove('active');
+    revealChenle.classList.remove('active');
+    if (!moved) swingHouse.classList.toggle('flipped');
+  }
+  swingHouse.addEventListener('pointerdown', pointerDown);
+  window.addEventListener('pointermove', pointerMove);
+  window.addEventListener('pointerup', pointerUp);
+  window.addEventListener('pointercancel', pointerUp);
+
+  /* ---- Panel 4: postcard carousel ---- */
+  const track = document.getElementById('carouselTrack');
+  const cardCount = track.children.length;
+  const dotsRow = document.getElementById('carouselDots');
+  for (let i=0;i<cardCount;i++){ const s=document.createElement('span'); if(i===0) s.classList.add('active'); dotsRow.appendChild(s); }
+  let cardIndex = 0;
+  function renderCarousel(){
+    track.style.transform = `translateX(-${cardIndex*100}%)`;
+    Array.from(dotsRow.children).forEach((d,i)=>d.classList.toggle('active', i===cardIndex));
+  }
+  document.getElementById('cardNext').addEventListener('click', ()=>{ cardIndex=(cardIndex+1)%cardCount; renderCarousel(); });
+  document.getElementById('cardPrev').addEventListener('click', ()=>{ cardIndex=(cardIndex-1+cardCount)%cardCount; renderCarousel(); });
+  let cStartX=null;
+  track.addEventListener('touchstart', e=>{ cStartX=e.touches[0].clientX; }, {passive:true});
+  track.addEventListener('touchend', e=>{
+    if (cStartX===null) return;
+    const dx = e.changedTouches[0].clientX - cStartX;
+    if (dx < -40) cardIndex=(cardIndex+1)%cardCount;
+    else if (dx > 40) cardIndex=(cardIndex-1+cardCount)%cardCount;
+    renderCarousel(); cStartX=null;
+  });
+
+  /* ---- Panel 5: scratch card ---- */
+  const scratchWrap = document.getElementById('scratchWrap');
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
+  function sizeCanvas(){
+    const r = scratchWrap.getBoundingClientRect();
+    canvas.width = r.width; canvas.height = r.height;
+    const grad = ctx.createLinearGradient(0,0,r.width,r.height);
+    grad.addColorStop(0, '#D8C89A'); grad.addColorStop(1, '#B9893C');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,r.width,r.height);
+    ctx.fillStyle = '#6B5D48'; ctx.font = '600 13px JetBrains Mono, monospace'; ctx.textAlign='center';
+    ctx.fillText('SCRATCH HERE', r.width/2, r.height/2);
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+  let scratching = false;
+  function scratchAt(x,y){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(x,y,26,0,Math.PI*2); ctx.fill();
+  }
+  function getPos(e){
+    const r = canvas.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return {x: cx - r.left, y: cy - r.top};
+  }
+  function checkCleared(){
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let transparent = 0;
+    for (let i=3; i<data.length; i+=4*20){ if (data[i] === 0) transparent++; }
+    if (transparent / (data.length/4/20) > 0.55){
+      canvas.style.transition = 'opacity .5s ease';
+      canvas.style.opacity = '0';
+      canvas.style.pointerEvents = 'none';
+    }
+  }
+  canvas.addEventListener('mousedown', e=>{ scratching=true; const p=getPos(e); scratchAt(p.x,p.y); });
+  canvas.addEventListener('mousemove', e=>{ if(scratching){ const p=getPos(e); scratchAt(p.x,p.y); } });
+  window.addEventListener('mouseup', ()=>{ if(scratching){ scratching=false; checkCleared(); } });
+  canvas.addEventListener('touchstart', e=>{ scratching=true; const p=getPos(e); scratchAt(p.x,p.y); }, {passive:true});
+  canvas.addEventListener('touchmove', e=>{ const p=getPos(e); scratchAt(p.x,p.y); }, {passive:true});
+  canvas.addEventListener('touchend', ()=>{ scratching=false; checkCleared(); });
+
+  /* ---- Panel 6: counters ---- */
+  const relationshipStart = new Date('2023-07-03'); // <-- edit to your real anniversary date
+  const birthday = new Date(new Date().getFullYear(), 6, 14); // July 14
+  function updateCounters(){
+    const now = new Date();
+    document.getElementById('daysTogether').textContent = Math.floor((now - relationshipStart)/(1000*60*60*24)).toLocaleString();
+    let target = new Date(birthday);
+    if (now > target) target = new Date(target.getFullYear()+1, 6, 14);
+    document.getElementById('daysToBday').textContent = Math.ceil((target - now)/(1000*60*60*24));
+  }
+  updateCounters();
+</script>
+
+<script>
+  /* ============================================================
+     EASTER EGGS — a handful of tiny, personal surprises for Chhavi.
+     Purely additive: doesn't touch any existing element's behavior,
+     and never comes near the acrylic stand-tap logic above.
+  ============================================================ */
+  (function(){
+    const toast = document.createElement('div');
+    toast.className = 'ee-toast';
+    document.body.appendChild(toast);
+    let toastTimer;
+    function showToast(msg, ms = 2800){
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), ms);
+    }
+
+    function spawnHeart(x, y, glyph){
+      const h = document.createElement('div');
+      h.className = 'ee-heart';
+      h.textContent = glyph || ['💛','💌','✨','🌷','🐰','🌙'][Math.floor(Math.random() * 6)];
+      h.style.left = (x - 9) + 'px';
+      h.style.top = (y - 9) + 'px';
+      h.style.fontSize = (14 + Math.random() * 14) + 'px';
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 3300);
+    }
+    function heartBurst(x, y, count = 10){
+      for (let i = 0; i < count; i++){
+        setTimeout(() => spawnHeart(x + (Math.random() * 60 - 30), y + (Math.random() * 20 - 10)), i * 40);
+      }
+    }
+
+    /* 1 — tap the hero title after it's open, for a little burst */
+    const heroTitle = document.querySelector('#panel-hero h1');
+    if (heroTitle){
+      heroTitle.classList.add('ee-clickable');
+      heroTitle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        heartBurst(e.clientX, e.clientY, 12);
+        showToast('made with entirely too much love.');
+      });
+    }
+
+    /* 2 — the notice's meta stats each hide a one-liner */
+    document.querySelectorAll('#panel-notice .meta-item').forEach((item) => {
+      item.classList.add('ee-clickable');
+      item.addEventListener('click', (e) => {
+        const label = item.querySelector('.k')?.textContent || '';
+        const msgs = {
+          'Edition': 'and there will only ever be one — you.',
+          'For': 'obviously.',
+          'Since': "1,095-ish days, give or take. i'd redo every single one.",
+          'Drop date': "circle it. or don't — i already know you won't forget."
+        };
+        heartBurst(e.clientX, e.clientY, 6);
+        showToast(msgs[label] || 'hi. yes, you.');
+      });
+    });
+
+    /* 3 — triple-click the certificate seal for a hidden line */
+    const seal = document.querySelector('.cert .seal');
+    if (seal){
+      seal.classList.add('ee-clickable');
+      let sealClicks = 0, sealTimer;
+      seal.addEventListener('click', (e) => {
+        sealClicks++;
+        clearTimeout(sealTimer);
+        sealTimer = setTimeout(() => { sealClicks = 0; }, 900);
+        if (sealClicks === 3){
+          heartBurst(e.clientX, e.clientY, 16);
+          showToast('verified: one (1) girl, worth every bit of effort.', 3400);
+          sealClicks = 0;
+        }
+      });
+    }
+
+    /* 4 — five taps on the footer unlocks the very last secret */
+    const footer = document.querySelector('#panel-cert footer');
+    if (footer){
+      footer.classList.add('ee-clickable');
+      let footTaps = 0, footTimer;
+      footer.addEventListener('click', (e) => {
+        footTaps++;
+        clearTimeout(footTimer);
+        footTimer = setTimeout(() => { footTaps = 0; }, 1200);
+        if (footTaps >= 5){
+          heartBurst(e.clientX, e.clientY, 22);
+          showToast('you found it. i love you, chhavi. — always, aman', 4200);
+          footTaps = 0;
+        }
+      });
+    }
+
+    /* 5 — the "yours, always" signature gives a little wink back */
+    const sign = document.querySelector('.note-card .sign');
+    if (sign){
+      sign.classList.add('ee-clickable');
+      sign.addEventListener('click', (e) => {
+        heartBurst(e.clientX, e.clientY, 8);
+        showToast('always is a long time. good thing i meant it.');
+      });
+    }
+
+    /* 6 — double-tap the closed photobook cover before opening it */
+    const bookCoverTagEl = document.getElementById('bookCoverTag');
+    if (bookCoverTagEl){
+      let lastTap = 0;
+      bookCoverTagEl.addEventListener('click', () => {
+        const now = Date.now();
+        if (now - lastTap < 450 && bookStage.classList.contains('closed')) {
+          showToast('patience — good things take three years, apparently.');
+        }
+        lastTap = now;
+      });
+    }
+
+    /* 7 — tap the revealed scratch-card message for one more line */
+    const scratchMsgWrap = document.querySelector('.scratch-message');
+    if (scratchMsgWrap){
+      scratchMsgWrap.addEventListener('click', (e) => {
+        if (canvas.style.opacity === '0'){
+          heartBurst(e.clientX, e.clientY, 8);
+          showToast('P.S. still not over you. still never will be.');
+        }
+      });
+    }
+
+    /* 8 — type a few little words anywhere on the page */
+    let buffer = '';
+    const secretWords = {
+      'chhavi': "that's you. hi. 🐰",
+      'iloveyou': 'i love you too. obviously.',
+      'renjun': 'she knows. we all know. 😅',
+      'birthday': 'almost there — hold tight.'
+    };
+    window.addEventListener('keydown', (e) => {
+      if (e.key.length === 1) buffer = (buffer + e.key.toLowerCase()).slice(-12);
+      for (const word in secretWords){
+        if (buffer.endsWith(word)){
+          heartBurst(window.innerWidth / 2, window.innerHeight * 0.7, 18);
+          showToast(secretWords[word], 3200);
+          buffer = '';
+          break;
+        }
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
