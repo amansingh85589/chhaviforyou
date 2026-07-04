@@ -1786,5 +1786,457 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
   })();
 </script>
 
+<script>
+  /* ============================================================
+     BONUS INTERACTIVE EASTER EGGS — fully additive.
+     Does not touch, override, or depend on any existing code.
+     Trigger 1: triple-click the "days together" number → Catch the Hearts game
+     Trigger 2: Konami code (↑ ↑ ↓ ↓ ← → ← → b a) anywhere → Spin the Wheel
+  ============================================================ */
+  (function(){
+    /* ---- shared styles, injected once ---- */
+    const eeStyle = document.createElement('style');
+    eeStyle.textContent = `
+      .ee2-overlay{
+        position:fixed; inset:0; z-index:99999;
+        background:rgba(58,46,34,0.72);
+        display:flex; align-items:center; justify-content:center;
+        opacity:0; pointer-events:none;
+        transition:opacity .3s ease;
+        padding:20px;
+      }
+      .ee2-overlay.show{ opacity:1; pointer-events:auto; }
+      .ee2-card{
+        background:var(--cream, #F6EFDC);
+        border-radius:20px;
+        padding:28px 24px 22px;
+        max-width:380px; width:100%;
+        text-align:center;
+        box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+        font-family:'Manrope', sans-serif;
+        position:relative;
+      }
+      .ee2-card h3{
+        font-family:'Fraunces', serif;
+        font-size:20px;
+        color:var(--ink, #3A2E22);
+        margin-bottom:6px;
+      }
+      .ee2-card .ee2-sub{
+        font-size:12.5px;
+        color:var(--ink-soft, #6B5D48);
+        margin-bottom:14px;
+      }
+      .ee2-close{
+        position:absolute; top:10px; right:12px;
+        width:28px; height:28px; border-radius:50%;
+        background:var(--white,#FFFCF4); border:1px solid rgba(58,46,34,0.15);
+        color:var(--ink,#3A2E22); font-size:14px; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+      }
+      .ee2-btn{
+        font-family:'JetBrains Mono', monospace;
+        font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+        background:var(--gold,#B9893C); color:var(--white,#FFFCF4);
+        padding:10px 18px; border-radius:30px; cursor:pointer;
+        display:inline-block; margin-top:12px; border:none;
+      }
+      .ee2-btn.secondary{
+        background:transparent; color:var(--gold,#B9893C);
+        border:1px solid var(--gold,#B9893C);
+      }
+      /* --- catch-the-hearts game --- */
+      .ee2-game-wrap{ position:relative; margin:0 auto 6px; }
+      .ee2-canvas{
+        background:linear-gradient(180deg, #FFF7E8, #FDEBD4);
+        border-radius:14px;
+        touch-action:none;
+        cursor:crosshair;
+        display:block;
+        margin:0 auto;
+      }
+      .ee2-hud{
+        display:flex; justify-content:space-between;
+        font-family:'JetBrains Mono', monospace;
+        font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
+        color:var(--ink-soft,#6B5D48);
+        margin-bottom:8px;
+        padding:0 2px;
+      }
+      .ee2-result-msg{
+        font-family:'Fraunces', serif; font-style:italic;
+        font-size:14.5px; line-height:1.6; color:var(--ink,#3A2E22);
+        margin-top:10px;
+      }
+      /* --- spin wheel --- */
+      .ee2-wheel-wrap{ position:relative; width:260px; height:260px; margin:0 auto 14px; }
+      .ee2-wheel-pointer{
+        position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+        width:0; height:0;
+        border-left:10px solid transparent;
+        border-right:10px solid transparent;
+        border-top:18px solid var(--gold,#B9893C);
+        z-index:3;
+      }
+      .ee2-wheel-canvas{ display:block; border-radius:50%; box-shadow:0 10px 30px -10px rgba(58,46,34,0.4); }
+      .ee2-prize{
+        font-family:'Fraunces', serif; font-size:16px; font-style:italic;
+        color:var(--ink,#3A2E22); min-height:22px; margin-top:4px;
+      }
+    `;
+    document.head.appendChild(eeStyle);
+
+    /* ============================================================
+       EGG A — Catch the Hearts
+       Trigger: triple-click on the "days together" counter number
+    ============================================================ */
+    function buildHeartGame(){
+      const overlay = document.createElement('div');
+      overlay.className = 'ee2-overlay';
+      overlay.innerHTML = `
+        <div class="ee2-card">
+          <button class="ee2-close" aria-label="Close">✕</button>
+          <h3>catch the hearts 💛</h3>
+          <div class="ee2-sub">tap the falling hearts before time runs out</div>
+          <div class="ee2-hud">
+            <span>score: <b id="ee2Score">0</b></span>
+            <span>time: <b id="ee2Time">20</b>s</span>
+          </div>
+          <div class="ee2-game-wrap">
+            <canvas class="ee2-canvas" id="ee2Canvas" width="300" height="360"></canvas>
+          </div>
+          <div id="ee2ResultBox" style="display:none;">
+            <div class="ee2-result-msg" id="ee2ResultMsg"></div>
+          </div>
+          <button class="ee2-btn" id="ee2StartBtn">start</button>
+          <button class="ee2-btn secondary" id="ee2AgainBtn" style="display:none;">play again</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const closeBtn = overlay.querySelector('.ee2-close');
+      const canvas = overlay.querySelector('#ee2Canvas');
+      const ctx = canvas.getContext('2d');
+      const scoreEl = overlay.querySelector('#ee2Score');
+      const timeEl = overlay.querySelector('#ee2Time');
+      const startBtn = overlay.querySelector('#ee2StartBtn');
+      const againBtn = overlay.querySelector('#ee2AgainBtn');
+      const resultBox = overlay.querySelector('#ee2ResultBox');
+      const resultMsg = overlay.querySelector('#ee2ResultMsg');
+
+      let hearts = [];
+      let score = 0;
+      let timeLeft = 20;
+      let running = false;
+      let rafId = null;
+      let timerId = null;
+      let floaters = []; // "+1" popups
+
+      function spawnHeart(){
+        hearts.push({
+          x: 20 + Math.random() * (canvas.width - 40),
+          y: -20,
+          speed: 1.1 + Math.random() * 1.6,
+          size: 18 + Math.random() * 14,
+          glyph: Math.random() > 0.2 ? '💛' : '✨'
+        });
+      }
+
+      function resultMessage(s){
+        if (s >= 15) return "okay professional heart-catcher. still fewer than the number of times i think about you daily (times ten).";
+        if (s >= 8) return "not bad at all — though still fewer hearts than you've stolen from me these 3 years.";
+        return "the hearts move fast, i know. still slower than how fast i fell for you.";
+      }
+
+      function endGame(){
+        running = false;
+        cancelAnimationFrame(rafId);
+        clearInterval(timerId);
+        hearts = [];
+        resultBox.style.display = 'block';
+        resultMsg.textContent = `Score: ${score} — ${resultMessage(score)}`;
+        startBtn.style.display = 'none';
+        againBtn.style.display = 'inline-block';
+      }
+
+      function loop(){
+        if (!running) return;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        hearts.forEach(h => { h.y += h.speed; });
+        hearts = hearts.filter(h => h.y < canvas.height + 30);
+        if (Math.random() < 0.045) spawnHeart();
+
+        ctx.font = '24px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        hearts.forEach(h => {
+          ctx.font = `${h.size}px sans-serif`;
+          ctx.fillText(h.glyph, h.x, h.y);
+        });
+
+        floaters.forEach(f => { f.y -= 1.4; f.life -= 1; });
+        floaters = floaters.filter(f => f.life > 0);
+        ctx.font = '13px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#B9893C';
+        floaters.forEach(f => {
+          ctx.globalAlpha = Math.max(f.life / 30, 0);
+          ctx.fillText('+1', f.x, f.y);
+        });
+        ctx.globalAlpha = 1;
+
+        rafId = requestAnimationFrame(loop);
+      }
+
+      function handleTap(e){
+        if (!running) return;
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const x = (clientX - rect.left) * (canvas.width / rect.width);
+        const y = (clientY - rect.top) * (canvas.height / rect.height);
+
+        for (let i = hearts.length - 1; i >= 0; i--){
+          const h = hearts[i];
+          const dx = x - h.x, dy = y - h.y;
+          if (Math.sqrt(dx*dx + dy*dy) < h.size * 0.8){
+            hearts.splice(i, 1);
+            score++;
+            scoreEl.textContent = score;
+            floaters.push({x: h.x, y: h.y, life: 30});
+            break;
+          }
+        }
+      }
+      canvas.addEventListener('pointerdown', handleTap);
+
+      function startGame(){
+        score = 0; timeLeft = 20; hearts = []; floaters = [];
+        scoreEl.textContent = 0; timeEl.textContent = 20;
+        resultBox.style.display = 'none';
+        startBtn.style.display = 'none';
+        againBtn.style.display = 'none';
+        running = true;
+        loop();
+        timerId = setInterval(() => {
+          timeLeft--;
+          timeEl.textContent = timeLeft;
+          if (timeLeft <= 0) endGame();
+        }, 1000);
+      }
+
+      startBtn.addEventListener('click', startGame);
+      againBtn.addEventListener('click', startGame);
+
+      function closeOverlay(){
+        running = false;
+        cancelAnimationFrame(rafId);
+        clearInterval(timerId);
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.remove(), 300);
+      }
+      closeBtn.addEventListener('click', closeOverlay);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
+
+      requestAnimationFrame(() => overlay.classList.add('show'));
+    }
+
+    const daysTogetherEl = document.getElementById('daysTogether');
+    if (daysTogetherEl){
+      daysTogetherEl.style.cursor = 'pointer';
+      let tapCount = 0, tapTimer;
+      daysTogetherEl.addEventListener('click', () => {
+        tapCount++;
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(() => { tapCount = 0; }, 700);
+        if (tapCount === 3){
+          tapCount = 0;
+          buildHeartGame();
+        }
+      });
+    }
+    /* ---- mobile-friendly trigger for Spin the Wheel: 5 taps on birthday countdown ---- */
+ /* ---- mobile-friendly trigger for Spin the Wheel: 5 taps on birthday countdown ---- */
+    /* ---- hidden NCT Dream sequence trigger: Renjun x3, then Chenle x4 (7 = full member count) ---- */
+    const standeeCardsList = Array.from(document.querySelectorAll('.standee-card'));
+    function findStandeeCardByPhoto(name){
+      return standeeCardsList.find(card => card.querySelector(`[data-standee="${name}"]`));
+    }
+    const renjunStandeeCard = findStandeeCardByPhoto('renjunCutout');
+    const chenleStandeeCard = findStandeeCardByPhoto('chenleCutout');
+
+    if (renjunStandeeCard && chenleStandeeCard){
+      const requiredSeq = ['renjun','renjun','renjun','chenle','chenle','chenle','chenle'];
+      let seqProgress = 0;
+      let seqTimer = null;
+
+      function resetSeq(){ seqProgress = 0; }
+
+      function registerTap(who){
+        clearTimeout(seqTimer);
+        if (who === requiredSeq[seqProgress]){
+          seqProgress++;
+          if (seqProgress === requiredSeq.length){
+            seqProgress = 0;
+            buildWheelGame();
+            return;
+          }
+          seqTimer = setTimeout(resetSeq, 2200);
+        } else {
+          // wrong tap breaks the chain — but allow it to be the start of a fresh attempt
+          seqProgress = (who === requiredSeq[0]) ? 1 : 0;
+          seqTimer = setTimeout(resetSeq, 2200);
+        }
+      }
+
+      renjunStandeeCard.style.cursor = 'pointer';
+      chenleStandeeCard.style.cursor = 'pointer';
+      renjunStandeeCard.addEventListener('click', () => registerTap('renjun'));
+      chenleStandeeCard.addEventListener('click', () => registerTap('chenle'));
+    }
+    
+
+    /* ============================================================
+       EGG B — Konami code → Spin the Wheel (date-night picker)
+       Trigger: ↑ ↑ ↓ ↓ ← → ← → b a
+    ============================================================ */
+    function buildWheelGame(){
+      const overlay = document.createElement('div');
+      overlay.className = 'ee2-overlay';
+      overlay.innerHTML = `
+        <div class="ee2-card">
+          <button class="ee2-close" aria-label="Close">✕</button>
+          <h3>spin for us 🎡</h3>
+          <div class="ee2-sub">whatever it lands on, we're doing it</div>
+          <div class="ee2-wheel-wrap">
+            <div class="ee2-wheel-pointer"></div>
+            <canvas class="ee2-wheel-canvas" id="ee2Wheel" width="260" height="260"></canvas>
+          </div>
+          <div class="ee2-prize" id="ee2Prize">&nbsp;</div>
+          <button class="ee2-btn" id="ee2SpinBtn">spin the wheel</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const closeBtn = overlay.querySelector('.ee2-close');
+      const canvas = overlay.querySelector('#ee2Wheel');
+      const ctx = canvas.getContext('2d');
+      const spinBtn = overlay.querySelector('#ee2SpinBtn');
+      const prizeEl = overlay.querySelector('#ee2Prize');
+
+      const segments = [
+        "movie night — your pick",
+        "i cook, you choose the menu",
+        "no-argument day (my treat)",
+        "long drive + your playlist",
+        "photo dump date together",
+        "mandatory extra-long hug",
+        "one wish granted (within reason)",
+        "you pick the place, we go"
+      ];
+      const colors = ['#F3D98B','#EFAFA6','#9CB89A','#B9893C','#D8C89A','#8B5E3C','#F6EFDC','#C4AF78'];
+      const segAngle = (2 * Math.PI) / segments.length;
+      let rotation = 0;
+      let spinning = false;
+
+      function drawWheel(rot){
+        const r = canvas.width / 2;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.save();
+        ctx.translate(r, r);
+        ctx.rotate(rot);
+        for (let i = 0; i < segments.length; i++){
+          const start = i * segAngle;
+          ctx.beginPath();
+          ctx.moveTo(0,0);
+          ctx.arc(0,0,r-4, start, start + segAngle);
+          ctx.closePath();
+          ctx.fillStyle = colors[i % colors.length];
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(58,46,34,0.25)';
+          ctx.stroke();
+
+          ctx.save();
+          ctx.rotate(start + segAngle / 2);
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#3A2E22';
+          ctx.font = '10px "JetBrains Mono", monospace';
+          const words = segments[i].split(' ');
+          let line = '';
+          const lines = [];
+          words.forEach(w => {
+            if ((line + w).length > 14){ lines.push(line); line = w + ' '; }
+            else line += w + ' ';
+          });
+          lines.push(line);
+          lines.forEach((ln, li) => {
+            ctx.fillText(ln.trim(), r - 14, (li - (lines.length-1)/2) * 11);
+          });
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+      drawWheel(0);
+
+      function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+      function spin(){
+        if (spinning) return;
+        spinning = true;
+        prizeEl.textContent = '';
+        const spins = 5 + Math.random() * 2;
+        const finalAngle = Math.random() * 2 * Math.PI;
+        const targetRotation = rotation + spins * 2 * Math.PI + finalAngle;
+        const startRotation = rotation;
+        const duration = 3800;
+        const startTime = performance.now();
+
+        function animate(now){
+          const elapsed = now - startTime;
+          const t = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(t);
+          rotation = startRotation + (targetRotation - startRotation) * eased;
+          drawWheel(rotation);
+          if (t < 1){
+            requestAnimationFrame(animate);
+          } else {
+            spinning = false;
+            const normalized = ((rotation % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+            // pointer is fixed at top (angle = -PI/2 i.e. 270deg from 0); find which segment sits there
+            const pointerAngle = (2*Math.PI - normalized + (3*Math.PI/2)) % (2*Math.PI);
+            const idx = Math.floor(pointerAngle / segAngle) % segments.length;
+            prizeEl.textContent = `you got: "${segments[idx]}"`;
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+
+      spinBtn.addEventListener('click', spin);
+
+      function closeOverlay(){
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.remove(), 300);
+      }
+      closeBtn.addEventListener('click', closeOverlay);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
+
+      requestAnimationFrame(() => overlay.classList.add('show'));
+    }
+
+    const konamiSeq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+    let konamiPos = 0;
+    window.addEventListener('keydown', (e) => {
+      if (e.code === konamiSeq[konamiPos]) {
+        konamiPos++;
+        if (konamiPos === konamiSeq.length){
+          konamiPos = 0;
+          buildWheelGame();
+        }
+      } else {
+        konamiPos = (e.code === konamiSeq[0]) ? 1 : 0;
+      }
+    });
+  })();
+</script>
+
 </body>
 </html>
