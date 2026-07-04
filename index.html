@@ -1509,7 +1509,14 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
     if (currentPage < total - 1) { currentPage++; renderBook(currentPage); }
   });
   document.getElementById('bookPrev').addEventListener('click', () => {
-    if (currentPage > -1) { const target = currentPage; currentPage--; renderBook(target); }
+    if (currentPage > -1) {
+      const target = currentPage;
+      currentPage--;
+      renderBook(target);
+    } else if (bookStage.classList.contains('open')) {
+      bookStage.classList.remove('open');
+      bookStage.classList.add('closed');
+    }
   });
   renderBook();
 
