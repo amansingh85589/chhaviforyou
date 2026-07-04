@@ -756,24 +756,50 @@
     padding:4px 9px; border-radius:20px;
   }
 
-  /* ============ RUNNING SPITZ ============ */
-#ee-dog{
+  /* ============ TWO RUNNING DOGS ============ */
+/* ============ TWO RUNNING DOGS ============ */
+.ee-dog{
   position:fixed;
   top:0; left:0;
   width:64px; height:64px;
   pointer-events:none;
   z-index:40;
   will-change:transform;
+  transition:opacity .6s ease;
 }
-#ee-dog img{
+.ee-dog img{
+  position:absolute; inset:0;
   width:100%; height:100%; object-fit:contain;
   display:block;
   filter:drop-shadow(0 6px 8px rgba(58,46,34,0.25));
+  opacity:0;
+  transition:opacity .35s ease;
 }
-#ee-dog.dog-behind{ z-index:0; }
-#ee-dog.dog-front{ z-index:600; }
+.ee-dog img.frame-active{ opacity:1; }
+.ee-dog.dog-behind{ z-index:0; }
+.ee-dog.dog-front{ z-index:600; }
+.ee-dog.hidden{ opacity:0; }
+
+.ee-dog-together{
+  position:fixed;
+  top:0; left:0;
+  width:120px; height:90px;
+  pointer-events:none;
+  z-index:600;
+  opacity:0;
+  transition:opacity .6s ease;
+  will-change:transform;
+}
+.ee-dog-together.show{ opacity:1; }
+.ee-dog-together img{
+  width:100%; height:100%; object-fit:contain;
+  display:block;
+  filter:drop-shadow(0 8px 10px rgba(58,46,34,0.3));
+}
+
 @media (max-width:640px){
-  #ee-dog{ width:48px; height:48px; }
+  .ee-dog{ width:48px; height:48px; }
+  .ee-dog-together{ width:96px; height:72px; }
 }
 </style>
 </head>
@@ -2258,84 +2284,179 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
   })();
 </script>
 <script>
-  /* RUNNING SPITZ — wanders on its own, dips above/below content,
-     and chases your cursor or your finger. Fully additive. */
+  /* TWO RUNNING DOGS + together photo — smooth, slow, professional.
+     Dogs wander independently and occasionally meet to "play."
+     Moving the cursor or touching the screen shows ONLY the
+     together photo, gliding smoothly toward the pointer — the two
+     separate dogs hide while that's happening. */
   (function(){
-    const DOG_FRAMES = ['./assets/spitz-idle.png', './assets/spitz-walk.png'];
+    const DOG_CONFIGS = [
+      { id: 'ee-dog-black', frames: ['./assets/dog-black-1.png', './assets/dog-black-2.png'], size: 64 },
+      { id: 'ee-dog-white', frames: ['./assets/dog-white-1.png', './assets/dog-white-2.png'], size: 60 }
+    ];
+    const TOGETHER_SRC = './assets/dogs-together.png';
 
-    const dog = document.createElement('div');
-    dog.id = 'ee-dog';
-    const img = document.createElement('img');
-    img.src = DOG_FRAMES[0];
-    img.alt = '';
-    dog.appendChild(img);
-    document.body.appendChild(dog);
+    const dogs = DOG_CONFIGS.map((cfg, i) => {
+      const el = document.createElement('div');
+      el.className = 'ee-dog';
+      el.id = cfg.id;
+      el.style.width = cfg.size + 'px';
+      el.style.height = cfg.size + 'px';
 
-    let x = window.innerWidth * 0.5;
-    let y = window.innerHeight * 0.7;
-    let targetX = x, targetY = y;
-    let facing = 1;
-    let frameIdx = 0;
-    let lastFrameSwap = 0;
-    let chasing = false;
-    let chaseUntil = 0;
+      const img0 = document.createElement('img');
+      img0.src = cfg.frames[0];
+      img0.alt = '';
+      img0.className = 'frame-active';
+      const img1 = document.createElement('img');
+      img1.src = cfg.frames[1];
+      img1.alt = '';
 
-    function pickRandomTarget(){
-      targetX = 40 + Math.random() * (window.innerWidth - 80);
-      targetY = 60 + Math.random() * (window.innerHeight - 120);
+      el.appendChild(img0);
+      el.appendChild(img1);
+      document.body.appendChild(el);
+
+      return {
+        el, imgs: [img0, img1],
+        frameIdx: 0,
+        lastFrameSwap: 0,
+        size: cfg.size,
+        x: window.innerWidth * (0.3 + i * 0.4),
+        y: window.innerHeight * (0.5 + (i % 2) * 0.15),
+        targetX: 0, targetY: 0,
+        facing: 1
+      };
+    });
+    dogs.forEach(pickRandomTarget);
+
+    const togetherEl = document.createElement('div');
+    togetherEl.className = 'ee-dog-together';
+    const togetherImg = document.createElement('img');
+    togetherImg.src = TOGETHER_SRC;
+    togetherImg.alt = '';
+    togetherEl.appendChild(togetherImg);
+    document.body.appendChild(togetherEl);
+    let togetherX = window.innerWidth / 2;
+    let togetherY = window.innerHeight / 2;
+
+    function pickRandomTarget(d){
+      d.targetX = 40 + Math.random() * (window.innerWidth - 80);
+      d.targetY = 60 + Math.random() * (window.innerHeight - 120);
     }
-    pickRandomTarget();
 
-    function setChaseTarget(cx, cy){
-      targetX = Math.min(Math.max(cx, 30), window.innerWidth - 30);
-      targetY = Math.min(Math.max(cy, 40), window.innerHeight - 40);
-      chasing = true;
-      chaseUntil = Date.now() + 1400;
+    // phases: 'wander' | 'approach' (auto meet-up) | 'together' (auto play) | 'cursor' (following pointer)
+    let phase = 'wander';
+    let phaseUntil = 0;
+    let cursorX = window.innerWidth / 2;
+    let cursorY = window.innerHeight / 2;
+    let cursorIdleTimer = null;
+
+    function showDogs(){
+      dogs.forEach(d => d.el.classList.remove('hidden'));
+      togetherEl.classList.remove('show');
+    }
+    function showTogetherAt(x, y){
+      dogs.forEach(d => d.el.classList.add('hidden'));
+      togetherEl.classList.add('show');
+      togetherX = x; togetherY = y;
     }
 
-    window.addEventListener('mousemove', (e) => setChaseTarget(e.clientX, e.clientY + 40));
+    function enterCursorMode(cx, cy){
+      cursorX = cx; cursorY = cy;
+      if (phase !== 'cursor') showTogetherAt(togetherX, togetherY);
+      phase = 'cursor';
+      clearTimeout(cursorIdleTimer);
+      cursorIdleTimer = setTimeout(() => {
+        phase = 'wander';
+        showDogs();
+        dogs.forEach(pickRandomTarget);
+      }, 1100);
+    }
+    window.addEventListener('mousemove', (e) => enterCursorMode(e.clientX, e.clientY + 30));
     window.addEventListener('touchmove', (e) => {
-      if (e.touches && e.touches[0]) setChaseTarget(e.touches[0].clientX, e.touches[0].clientY + 40);
+      if (e.touches && e.touches[0]) enterCursorMode(e.touches[0].clientX, e.touches[0].clientY + 30);
     }, { passive:true });
     window.addEventListener('touchstart', (e) => {
-      if (e.touches && e.touches[0]) setChaseTarget(e.touches[0].clientX, e.touches[0].clientY + 40);
+      if (e.touches && e.touches[0]) enterCursorMode(e.touches[0].clientX, e.touches[0].clientY + 30);
     }, { passive:true });
 
-    function togglePeek(){
-      dog.classList.remove('dog-front');
-      dog.classList.add('dog-behind');
-      setTimeout(() => {
-        dog.classList.remove('dog-behind');
-        dog.classList.add('dog-front');
-        setTimeout(togglePeek, 3500 + Math.random() * 3000);
-      }, 1800 + Math.random() * 1500);
+    function maybeStartPlaying(){
+      if (phase === 'wander' && Math.random() < 0.4){
+        const meetX = 100 + Math.random() * (window.innerWidth - 200);
+        const meetY = 120 + Math.random() * (window.innerHeight - 220);
+        dogs[0].meetX = meetX; dogs[0].meetY = meetY;
+        dogs[0].targetX = meetX - 20; dogs[0].targetY = meetY;
+        dogs[1].targetX = meetX + 20; dogs[1].targetY = meetY;
+        phase = 'approach';
+      }
+      setTimeout(maybeStartPlaying, 6000 + Math.random() * 5000);
     }
-    setTimeout(togglePeek, 2500);
+    setTimeout(maybeStartPlaying, 5000);
+
+    function togglePeek(d){
+      d.el.classList.remove('dog-front');
+      d.el.classList.add('dog-behind');
+      setTimeout(() => {
+        d.el.classList.remove('dog-behind');
+        d.el.classList.add('dog-front');
+        setTimeout(() => togglePeek(d), 4000 + Math.random() * 3500);
+      }, 2000 + Math.random() * 1800);
+    }
+    dogs.forEach((d, i) => setTimeout(() => togglePeek(d), 2500 + i * 1400));
 
     function loop(now){
-      if (chasing && Date.now() > chaseUntil){ chasing = false; pickRandomTarget(); }
-
-      const dx = targetX - x, dy = targetY - y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 12 && !chasing) pickRandomTarget();
-
-      const speed = chasing ? 0.09 : 0.035;
-      x += dx * speed;
-      y += dy * speed;
-      if (Math.abs(dx) > 2) facing = dx < 0 ? -1 : 1;
-
-      dog.style.transform = `translate(${x - 32}px, ${y - 32}px) scaleX(${facing})`;
-
-      if (dist > 3 && now - lastFrameSwap > 160){
-        frameIdx = 1 - frameIdx;
-        img.src = DOG_FRAMES[frameIdx];
-        lastFrameSwap = now;
+      if (phase === 'together' && Date.now() > phaseUntil){
+        phase = 'wander';
+        showDogs();
+        dogs.forEach(pickRandomTarget);
       }
+
+      if (phase === 'cursor'){
+        const dx = cursorX - togetherX;
+        const dy = cursorY - togetherY;
+       togetherX += dx * 0.05;
+togetherY += dy * 0.05;
+        togetherEl.style.transform = `translate(${togetherX - 60}px, ${togetherY - 45}px)`;
+      } else {
+        dogs.forEach((d) => {
+          const dx = d.targetX - d.x;
+          const dy = d.targetY - d.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+
+          if (dist < 12 && phase === 'wander') pickRandomTarget(d);
+
+          const speed = phase === 'approach' ? 0.014 : 0.01;
+          d.x += dx * speed;
+          d.y += dy * speed;
+          if (Math.abs(dx) > 2) d.facing = dx < 0 ? -1 : 1;
+
+          const half = d.size / 2;
+          d.el.style.transform = `translate(${d.x - half}px, ${d.y - half}px) scaleX(${d.facing})`;
+
+          if (dist > 3 && now - d.lastFrameSwap > 700){
+            d.frameIdx = 1 - d.frameIdx;
+            d.imgs.forEach((img, idx) => img.classList.toggle('frame-active', idx === d.frameIdx));
+            d.lastFrameSwap = now;
+          }
+        });
+
+        if (phase === 'approach'){
+          const d0 = dogs[0], d1 = dogs[1];
+          const dist0 = Math.hypot(d0.targetX - d0.x, d0.targetY - d0.y);
+          const dist1 = Math.hypot(d1.targetX - d1.x, d1.targetY - d1.y);
+          if (dist0 < 15 && dist1 < 15){
+            phase = 'together';
+            phaseUntil = Date.now() + 3500 + Math.random() * 2000;
+            showTogetherAt(d0.meetX, d0.meetY);
+            togetherEl.style.transform = `translate(${d0.meetX - 60}px, ${d0.meetY - 45}px)`;
+          }
+        }
+      }
+
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
 
-    window.addEventListener('resize', pickRandomTarget);
+    window.addEventListener('resize', () => dogs.forEach(pickRandomTarget));
   })();
 </script>
 
