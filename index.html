@@ -767,6 +767,15 @@
   will-change:transform;
   transition:opacity .6s ease;
 }
+.ee-dog-hitzone{
+  position:absolute;
+  top:50%; left:50%;
+  width:220%; height:220%;
+  transform:translate(-50%, -50%);
+  pointer-events:auto;
+  cursor:pointer;
+  border-radius:50%;
+}
 .ee-dog img{
   position:absolute; inset:0;
   width:100%; height:100%; object-fit:contain;
@@ -796,7 +805,26 @@
   display:block;
   filter:drop-shadow(0 8px 10px rgba(58,46,34,0.3));
 }
-
+.ee-pawprint{
+  position:fixed; pointer-events:none; z-index:35;
+  font-size:11px; opacity:0.55;
+  animation:eePawFade 1s ease-out forwards;
+}
+@keyframes eePawFade{
+  0%{ opacity:0.55; transform:scale(1); }
+  100%{ opacity:0; transform:scale(0.8); }
+}
+.ee-dog-bubble{
+  position:fixed; z-index:601;
+  background:var(--white,#FFFCF4); color:var(--ink,#3A2E22);
+  font-family:'Fraunces', serif; font-style:italic; font-size:12px;
+  padding:6px 12px; border-radius:14px;
+  box-shadow:0 8px 18px -8px rgba(58,46,34,0.4);
+  opacity:0; pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease;
+  transform:translate(-50%, 6px); white-space:nowrap;
+}
+.ee-dog-bubble.show{ opacity:1; transform:translate(-50%, 0); }
 @media (max-width:640px){
   .ee-dog{ width:48px; height:48px; }
   .ee-dog-together{ width:96px; height:72px; }
@@ -2291,8 +2319,8 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
      separate dogs hide while that's happening. */
   (function(){
     const DOG_CONFIGS = [
-      { id: 'ee-dog-black', frames: ['./assets/dog-black-1.png', './assets/dog-black-2.png'], size: 64 },
-      { id: 'ee-dog-white', frames: ['./assets/dog-white-1.png', './assets/dog-white-2.png'], size: 60 }
+      { id: 'ee-dog-black', name: 'Oreo', frames: ['./assets/dog-black-1.png', './assets/dog-black-2.png'], size: 64 },
+      { id: 'ee-dog-white', name: 'Chiku', frames: ['./assets/dog-white-1.png', './assets/dog-white-2.png'], size: 60 }
     ];
     const TOGETHER_SRC = './assets/dogs-together.png';
 
@@ -2311,14 +2339,19 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
       img1.src = cfg.frames[1];
       img1.alt = '';
 
+      const hitzone = document.createElement('div');
+      hitzone.className = 'ee-dog-hitzone';
       el.appendChild(img0);
       el.appendChild(img1);
+      el.appendChild(hitzone);
       document.body.appendChild(el);
 
       return {
         el, imgs: [img0, img1],
+        name: cfg.name,
         frameIdx: 0,
         lastFrameSwap: 0,
+        lastPawSpawn: 0,
         size: cfg.size,
         x: window.innerWidth * (0.3 + i * 0.4),
         y: window.innerHeight * (0.5 + (i % 2) * 0.15),
@@ -2327,6 +2360,15 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
       };
     });
     dogs.forEach(pickRandomTarget);
+    dogs.forEach((d) => {
+      const hitzoneEl = d.el.querySelector('.ee-dog-hitzone');
+      hitzoneEl.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        lastInteractionTime = Date.now();
+        wakeUp();
+        showBarkBubble(d);
+      });
+    });
 
     const togetherEl = document.createElement('div');
     togetherEl.className = 'ee-dog-together';
@@ -2341,6 +2383,61 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
     function pickRandomTarget(d){
       d.targetX = 40 + Math.random() * (window.innerWidth - 80);
       d.targetY = 60 + Math.random() * (window.innerHeight - 120);
+    }
+
+    let lastInteractionTime = Date.now();
+    let sleepy = false;
+    let sleepyBubbles = [];
+
+    function spawnPaw(d){
+      const paw = document.createElement('div');
+      paw.className = 'ee-pawprint';
+      paw.textContent = '🐾';
+      paw.style.left = (d.x - 6) + 'px';
+      paw.style.top = (d.y + d.size * 0.3) + 'px';
+      paw.style.fontSize = (9 + Math.random() * 4) + 'px';
+      paw.style.transform = `scaleX(${d.facing})`;
+      document.body.appendChild(paw);
+      setTimeout(() => paw.remove(), 1000);
+    }
+
+    function showFloatingBubble(x, y, text, ms){
+      const bubble = document.createElement('div');
+      bubble.className = 'ee-dog-bubble';
+      bubble.textContent = text;
+      bubble.style.left = x + 'px';
+      bubble.style.top = (y - 50) + 'px';
+      document.body.appendChild(bubble);
+      requestAnimationFrame(() => bubble.classList.add('show'));
+      setTimeout(() => {
+        bubble.classList.remove('show');
+        setTimeout(() => bubble.remove(), 350);
+      }, ms || 1400);
+      return bubble;
+    }
+
+    function showMeetBubble(x, y){ showFloatingBubble(x, y, '🐾🐾', 1400); }
+
+    function showBarkBubble(d){
+      const barkLines = [`${d.name}: chhavi didi aagai!`, `${d.name}: woof!`, `${d.name}: pet me pls`, `${d.name}: 🐾 hello 🐾`];
+      showFloatingBubble(d.x, d.y, barkLines[Math.floor(Math.random() * barkLines.length)], 1500);
+    }
+
+    function enterSleepMode(){
+      sleepy = true;
+      sleepyBubbles = dogs.map(d => {
+        const b = document.createElement('div');
+        b.className = 'ee-dog-bubble show';
+        b.textContent = 'z z z';
+        document.body.appendChild(b);
+        return b;
+      });
+    }
+    function wakeUp(){
+      if (!sleepy) return;
+      sleepy = false;
+      sleepyBubbles.forEach(b => b.remove());
+      sleepyBubbles = [];
     }
 
     // phases: 'wander' | 'approach' (auto meet-up) | 'together' (auto play) | 'cursor' (following pointer)
@@ -2361,6 +2458,8 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
     }
 
     function enterCursorMode(cx, cy){
+      lastInteractionTime = Date.now();
+      wakeUp();
       cursorX = cx; cursorY = cy;
       if (phase !== 'cursor') showTogetherAt(togetherX, togetherY);
       phase = 'cursor';
@@ -2376,6 +2475,7 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
       if (e.touches && e.touches[0]) enterCursorMode(e.touches[0].clientX, e.touches[0].clientY + 30);
     }, { passive:true });
     window.addEventListener('touchstart', (e) => {
+      if (e.target.closest && (e.target.closest('.ee-dog') || e.target.closest('.ee-dog-hitzone'))) return;
       if (e.touches && e.touches[0]) enterCursorMode(e.touches[0].clientX, e.touches[0].clientY + 30);
     }, { passive:true });
 
@@ -2404,6 +2504,9 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
     dogs.forEach((d, i) => setTimeout(() => togglePeek(d), 2500 + i * 1400));
 
     function loop(now){
+      if (!sleepy && phase === 'wander' && Date.now() - lastInteractionTime > 32000){
+        enterSleepMode();
+      }
       if (phase === 'together' && Date.now() > phaseUntil){
         phase = 'wander';
         showDogs();
@@ -2417,14 +2520,22 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
 togetherY += dy * 0.05;
         togetherEl.style.transform = `translate(${togetherX - 60}px, ${togetherY - 45}px)`;
       } else {
-        dogs.forEach((d) => {
+        dogs.forEach((d, i) => {
           const dx = d.targetX - d.x;
           const dy = d.targetY - d.y;
           const dist = Math.sqrt(dx*dx + dy*dy);
 
+          if (sleepy){
+            if (sleepyBubbles[i]){
+              sleepyBubbles[i].style.left = d.x + 'px';
+              sleepyBubbles[i].style.top = (d.y - 50) + 'px';
+            }
+            return;
+          }
+
           if (dist < 12 && phase === 'wander') pickRandomTarget(d);
 
-          const speed = phase === 'approach' ? 0.014 : 0.01;
+          const speed = phase === 'approach' ? 0.007 : 0.004;
           d.x += dx * speed;
           d.y += dy * speed;
           if (Math.abs(dx) > 2) d.facing = dx < 0 ? -1 : 1;
@@ -2432,10 +2543,14 @@ togetherY += dy * 0.05;
           const half = d.size / 2;
           d.el.style.transform = `translate(${d.x - half}px, ${d.y - half}px) scaleX(${d.facing})`;
 
-          if (dist > 3 && now - d.lastFrameSwap > 700){
+          if (dist > 3 && now - d.lastFrameSwap > 1600){
             d.frameIdx = 1 - d.frameIdx;
             d.imgs.forEach((img, idx) => img.classList.toggle('frame-active', idx === d.frameIdx));
             d.lastFrameSwap = now;
+          }
+          if (dist > 3 && now - d.lastPawSpawn > 450){
+            spawnPaw(d);
+            d.lastPawSpawn = now;
           }
         });
 
@@ -2446,6 +2561,7 @@ togetherY += dy * 0.05;
           if (dist0 < 15 && dist1 < 15){
             phase = 'together';
             phaseUntil = Date.now() + 3500 + Math.random() * 2000;
+            showMeetBubble(d0.meetX, d0.meetY);
             showTogetherAt(d0.meetX, d0.meetY);
             togetherEl.style.transform = `translate(${d0.meetX - 60}px, ${d0.meetY - 45}px)`;
           }
