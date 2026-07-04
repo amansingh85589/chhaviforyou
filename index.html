@@ -770,11 +770,13 @@
 .ee-dog-hitzone{
   position:absolute;
   top:50%; left:50%;
-  width:220%; height:220%;
+  width:340%; height:340%;
   transform:translate(-50%, -50%);
   pointer-events:auto;
   cursor:pointer;
   border-radius:50%;
+  touch-action:none;
+  z-index:9990;
 }
 .ee-dog img{
   position:absolute; inset:0;
@@ -786,6 +788,7 @@
 }
 .ee-dog img.frame-active{ opacity:1; }
 .ee-dog.dog-behind{ z-index:0; }
+.ee-dog.dog-behind .ee-dog-hitzone{ z-index:9990; }
 .ee-dog.dog-front{ z-index:600; }
 .ee-dog.hidden{ opacity:0; }
 
@@ -2360,15 +2363,6 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
       };
     });
     dogs.forEach(pickRandomTarget);
-    dogs.forEach((d) => {
-      const hitzoneEl = d.el.querySelector('.ee-dog-hitzone');
-      hitzoneEl.addEventListener('pointerdown', (e) => {
-        e.stopPropagation();
-        lastInteractionTime = Date.now();
-        wakeUp();
-        showBarkBubble(d);
-      });
-    });
 
     const togetherEl = document.createElement('div');
     togetherEl.className = 'ee-dog-together';
@@ -2475,8 +2469,10 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
       if (e.touches && e.touches[0]) enterCursorMode(e.touches[0].clientX, e.touches[0].clientY + 30);
     }, { passive:true });
     window.addEventListener('touchstart', (e) => {
-      if (e.target.closest && (e.target.closest('.ee-dog') || e.target.closest('.ee-dog-hitzone'))) return;
-      if (e.touches && e.touches[0]) enterCursorMode(e.touches[0].clientX, e.touches[0].clientY + 30);
+      if (e.touches && e.touches[0]){
+        const t = e.touches[0];
+        enterCursorMode(t.clientX, t.clientY + 30);
+      }
     }, { passive:true });
 
     function maybeStartPlaying(){
@@ -2491,6 +2487,15 @@ Happy Birthday, Chhavi. Thank you for giving me the happiest three years of my l
       setTimeout(maybeStartPlaying, 6000 + Math.random() * 5000);
     }
     setTimeout(maybeStartPlaying, 5000);
+
+    function scheduleAutoBark(d){
+      const delay = 8000 + Math.random() * 12000;
+      setTimeout(() => {
+        if (!sleepy && phase !== 'together') showBarkBubble(d);
+        scheduleAutoBark(d);
+      }, delay);
+    }
+    dogs.forEach((d, i) => setTimeout(() => scheduleAutoBark(d), 4000 + i * 5000));
 
     function togglePeek(d){
       d.el.classList.remove('dog-front');
